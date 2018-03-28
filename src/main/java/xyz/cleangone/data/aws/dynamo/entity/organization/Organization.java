@@ -1,0 +1,190 @@
+package xyz.cleangone.data.aws.dynamo.entity.organization;
+
+import com.amazonaws.services.dynamodbv2.datamodeling.*;
+import xyz.cleangone.data.aws.dynamo.entity.base.EntityField;
+import xyz.cleangone.data.aws.dynamo.entity.base.ImageContainer;
+import xyz.cleangone.util.Crypto;
+
+import java.util.Objects;
+
+@DynamoDBTable(tableName="Organization")
+public class Organization extends BaseOrg implements ImageContainer
+{
+    public enum PaymentProcessorType { iATS, None }
+
+    public static final EntityField LEFT_WIDTH_FIELD = new EntityField("org.leftColWidth", "Left Col. Width");
+    public static final EntityField CENTER_WIDTH_FIELD = new EntityField("org.centerColWidth", "Center Col. Width");
+    public static final EntityField RIGHT_WIDTH_FIELD = new EntityField("org.rightColWidth", "Right Col. Width");
+
+    public static final EntityField IATS_AGENT_CODE_FIELD = new EntityField("org.iaatsAgentCode", "iATS Agent Code");
+    public static final EntityField IATS_PASSWORD_FIELD = new EntityField("org.iatsPassord", "iATS Password");
+
+    private int leftColWidth;
+    private int centerColWidth;
+    private int rightColWidth;
+
+    private PaymentProcessorType paymentProcessorType;
+    private String paymentProcessorUser;
+    private String encryptedPaymentProcessorAuth;
+
+    public Organization()
+    {
+        super();
+    }
+    public Organization(String name)
+    {
+        super(name);
+    }
+
+
+    public String get(EntityField field)
+    {
+        if (IATS_AGENT_CODE_FIELD.equals(field)) return getPaymentProcessorUser();
+        else if (IATS_PASSWORD_FIELD.equals(field)) return getPaymentProcessorAuth();  // todo - do we want this available?
+        else return super.get(field);
+    }
+
+    public void set(EntityField field, String value)
+    {
+        if (IATS_AGENT_CODE_FIELD.equals(field)) setPaymentProcessorUser(value);
+        else if (IATS_PASSWORD_FIELD.equals(field)) setPaymentProcessorAuth(value);
+        else super.set(field, value);
+    }
+
+    public int getInt(EntityField field)
+    {
+        if (LEFT_WIDTH_FIELD.equals(field)) return getLeftColWidth();
+        else if (CENTER_WIDTH_FIELD.equals(field)) return getCenterColWidth();
+        else if (RIGHT_WIDTH_FIELD.equals(field)) return getRightColWidth();
+        else return super.getInt(field);
+    }
+
+    public void setInt(EntityField field, int value)
+    {
+        if (LEFT_WIDTH_FIELD.equals(field)) setLeftColWidth(value);
+        else if (CENTER_WIDTH_FIELD.equals(field)) setCenterColWidth(value);
+        else if (RIGHT_WIDTH_FIELD.equals(field)) setRightColWidth(value);
+        else super.setInt(field, value);
+    }
+
+
+    @DynamoDBIgnore
+    public String getPaymentProcessorAuth()
+    {
+        return getEncryptedPaymentProcessorAuth() == null ? null : Crypto.decrypt(getEncryptedPaymentProcessorAuth());
+    }
+
+    @DynamoDBIgnore
+    public void setPaymentProcessorAuth(String processorAuth)
+    {
+        setEncryptedPaymentProcessorAuth(encrypt(processorAuth));
+    }
+
+    private String encrypt(String s)
+    {
+        return Crypto.encrypt(Objects.requireNonNull(s));
+    }
+
+    @DynamoDBIgnore
+    public boolean isPaymentProcessor(PaymentProcessorType type)
+    {
+        return paymentProcessorType == type;
+    }
+
+    @DynamoDBIgnore
+    public boolean colWidthsSet()
+    {
+        return (leftColWidth != 0 || centerColWidth != 0 || rightColWidth != 0);
+    }
+
+    @DynamoDBAttribute(attributeName = "LeftColWidth")
+    public int getLeftColWidth()
+    {
+        return leftColWidth;
+    }
+    public void setLeftColWidth(int leftColWidth)
+    {
+        this.leftColWidth = leftColWidth;
+    }
+
+    @DynamoDBAttribute(attributeName = "CenterColWidth")
+    public int getCenterColWidth()
+    {
+        return centerColWidth;
+    }
+    public void setCenterColWidth(int centerColWidth)
+    {
+        this.centerColWidth = centerColWidth;
+    }
+
+    @DynamoDBAttribute(attributeName = "RightColWidth")
+    public int getRightColWidth()
+    {
+        return rightColWidth;
+    }
+    public void setRightColWidth(int rightColWidth)
+    {
+        this.rightColWidth = rightColWidth;
+    }
+
+    @DynamoDBTyped(DynamoDBMapperFieldModel.DynamoDBAttributeType.S)
+    public PaymentProcessorType getPaymentProcessorType()
+    {
+        return paymentProcessorType;
+    }
+    public void setPaymentProcessorType(PaymentProcessorType paymentProcessorType)
+    {
+        this.paymentProcessorType = paymentProcessorType;
+    }
+
+    @DynamoDBAttribute(attributeName = "PaymentProcessorUser")
+    public String getPaymentProcessorUser()
+    {
+        return paymentProcessorUser;
+    }
+    public void setPaymentProcessorUser(String paymentProcessorUser)
+    {
+        this.paymentProcessorUser = paymentProcessorUser;
+    }
+
+    @DynamoDBAttribute(attributeName = "EncryptedPaymentProcessorAuth")
+    public String getEncryptedPaymentProcessorAuth()
+    {
+        return encryptedPaymentProcessorAuth;
+    }
+    public void setEncryptedPaymentProcessorAuth(String encryptedPaymentProcessorAuth)
+    {
+        this.encryptedPaymentProcessorAuth = encryptedPaymentProcessorAuth;
+    }
+
+    public String getS3LinkPrefix(Organization org, String filePath)
+    {
+        return "org/" + org.getTag();
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) return true;
+        if (!(o instanceof Organization)) return false;
+        if (!super.equals(o)) return false;
+
+        Organization that = (Organization) o;
+
+        if (getLeftColWidth() != that.getLeftColWidth()) return false;
+        if (getCenterColWidth() != that.getCenterColWidth()) return false;
+        return getRightColWidth() == that.getRightColWidth();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = super.hashCode();
+        result = 31 * result + getLeftColWidth();
+        result = 31 * result + getCenterColWidth();
+        result = 31 * result + getRightColWidth();
+        return result;
+    }
+}
+
+
