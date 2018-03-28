@@ -59,7 +59,6 @@ public class EntityLastTouched
 
     public boolean entityChangedAfter(Date date, BaseEntity entity, EntityType type) { return entityChangedAfter(date, entity.getId(), type); }
 
-
     public boolean entityChangedAfter(Date date, String entityId, EntityType type)
     {
         if (date == null) { return true; }
