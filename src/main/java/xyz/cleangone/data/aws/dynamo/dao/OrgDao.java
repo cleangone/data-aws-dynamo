@@ -1,8 +1,9 @@
 package xyz.cleangone.data.aws.dynamo.dao;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
+import xyz.cleangone.data.aws.dynamo.entity.base.OrgLastTouched;
 import xyz.cleangone.data.aws.dynamo.entity.organization.Organization;
-import xyz.cleangone.data.cache.EntityType;
+import xyz.cleangone.data.aws.dynamo.entity.base.EntityType;
 
 import java.util.List;
 
@@ -41,8 +42,8 @@ public class OrgDao extends DynamoBaseDao<Organization>
     public void save(Organization org)
     {
         super.save(org);
-        entityLastTouched.touch(org.getId(), EntityType.Entity);
-        saveLastTouch(org.getId());
+        entityLastTouchedCache.touch(org.getId(), EntityType.Entity);
+        setEntityLastTouched(org.getId(), EntityType.Entity);
     }
 }
 

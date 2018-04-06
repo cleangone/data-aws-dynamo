@@ -6,12 +6,15 @@ import com.amazonaws.services.dynamodbv2.datamodeling.S3Link;
 import xyz.cleangone.data.aws.dynamo.dao.OrgDao;
 import xyz.cleangone.data.aws.dynamo.dao.PersonDao;
 import xyz.cleangone.data.aws.dynamo.dao.UserDao;
+import xyz.cleangone.data.aws.dynamo.entity.base.EntityLastTouched;
+import xyz.cleangone.data.aws.dynamo.entity.base.EntityType;
 import xyz.cleangone.data.aws.dynamo.entity.base.OrgLastTouched;
 import xyz.cleangone.data.aws.dynamo.entity.organization.Organization;
 import xyz.cleangone.data.aws.dynamo.entity.person.Person;
 import xyz.cleangone.data.aws.dynamo.entity.person.User;
 import xyz.cleangone.data.cache.EntityCache;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -19,7 +22,7 @@ import java.util.stream.Collectors;
 
 public class OrgManager implements ImageContainerManager
 {
-    private static final EntityCache<Person> PERSON_CACHE = new EntityCache<>();
+    public static final EntityCache<Person> PERSON_CACHE = new EntityCache<>(EntityType.Person);
 
     private OrgDao orgDao;
     private PersonDao personDao;
@@ -44,11 +47,12 @@ public class OrgManager implements ImageContainerManager
     
     public List<Person> getPeople()
     {
-        List<Person> people = PERSON_CACHE.get(org.getId());
+        Date start = new Date();
+        List<Person> people = PERSON_CACHE.get(org);
         if (people != null) { return people; }
 
         people = personDao.getByOrg(getOrgId());
-        PERSON_CACHE.set(people, org.getId());
+        PERSON_CACHE.put(org, people, start);
 
         return people;
     }
@@ -128,9 +132,9 @@ public class OrgManager implements ImageContainerManager
         return org;
     }
 
-    public OrgLastTouched getOrgLastTouched()
+    public EntityLastTouched getOrgLastTouched()
     {
-        return (org == null ? null : orgDao.getLastTouch(org.getId()));
+        return (org == null ? null : orgDao.getEntityLastTouched(org.getId()));
     }
 
     public Organization findOrg(String tag)

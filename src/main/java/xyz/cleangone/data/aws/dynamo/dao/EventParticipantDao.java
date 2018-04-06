@@ -1,10 +1,9 @@
 package xyz.cleangone.data.aws.dynamo.dao;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
+import xyz.cleangone.data.aws.dynamo.entity.base.OrgLastTouched;
 import xyz.cleangone.data.aws.dynamo.entity.organization.EventParticipant;
-import xyz.cleangone.data.aws.dynamo.entity.organization.OrgTag;
-import xyz.cleangone.data.cache.EntityLastTouched;
-import xyz.cleangone.data.cache.EntityType;
+import xyz.cleangone.data.aws.dynamo.entity.base.EntityType;
 
 import java.util.List;
 
@@ -19,7 +18,10 @@ public class EventParticipantDao extends DynamoBaseDao<EventParticipant>
     public void save(EventParticipant participant)
     {
         super.save(participant);
-        entityLastTouched.touch(participant.getEventId(), EntityType.Participant);
+        entityLastTouchedCache.touch(participant.getEventId(), EntityType.Participant);
+
+        // participants are cached by eventId
+        setEntityLastTouched(participant.getEventId(), EntityType.Participant);
     }
 }
 

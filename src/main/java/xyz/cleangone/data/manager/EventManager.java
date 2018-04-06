@@ -2,6 +2,8 @@ package xyz.cleangone.data.manager;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.S3Link;
 import xyz.cleangone.data.aws.dynamo.dao.*;
+import xyz.cleangone.data.aws.dynamo.entity.base.EntityType;
+import xyz.cleangone.data.aws.dynamo.entity.base.OrgLastTouched;
 import xyz.cleangone.data.aws.dynamo.entity.item.CatalogItem;
 import xyz.cleangone.data.aws.dynamo.entity.organization.EventDate;
 import xyz.cleangone.data.aws.dynamo.entity.organization.EventParticipant;
@@ -20,8 +22,9 @@ import static java.util.Objects.requireNonNull;
 
 public class EventManager implements ImageContainerManager
 {
-    private static final EntityCache<OrgEvent> EVENT_CACHE = new EntityCache<>();
-    private static final EntityCache<EventDate> EVENT_DATE_CACHE = new EntityCache<>();
+    public static final EntityCache<OrgEvent> EVENT_CACHE = new EntityCache<>(EntityType.Event);
+    public static final EntityCache<EventDate> EVENT_DATE_CACHE = new EntityCache<>(EntityType.EventDate);
+    public static final EntityCache<EventParticipant> PARTICIPANT_CACHE = new EntityCache<>(EntityType.Participant);
 
     private final EventDao eventDao;
     private final EventDateDao eventDateDao;
@@ -52,12 +55,13 @@ public class EventManager implements ImageContainerManager
 
     public List<OrgEvent> getEvents()
     {
-        List<OrgEvent> events = EVENT_CACHE.get(org.getId());
+        Date start = new Date();
+        List<OrgEvent> events = EVENT_CACHE.get(org);
         if (events != null) { return events; }
 
         events = new ArrayList<>(eventDao.getByOrg(org.getId()));
         events.sort((e1, e2) -> e1.getSortOrder().compareToIgnoreCase(e2.getSortOrder()));
-        EVENT_CACHE.set(events, org.getId());
+        EVENT_CACHE.put(org, events, start);
 
         return events;
     }
@@ -115,11 +119,12 @@ public class EventManager implements ImageContainerManager
 
     public List<EventDate> getEventDates()
     {
-        List<EventDate> eventDates = EVENT_DATE_CACHE.get(org.getId());
+        Date start = new Date();
+        List<EventDate> eventDates = EVENT_DATE_CACHE.get(org);
         if (eventDates != null) { return eventDates; }
 
         eventDates = eventDateDao.getByOrg(org.getId());
-        EVENT_DATE_CACHE.set(eventDates, org.getId());
+        EVENT_DATE_CACHE.put(org, eventDates, start);
 
         return eventDates;
     }
@@ -149,10 +154,20 @@ public class EventManager implements ImageContainerManager
     //
     // Participants
     //
+
+    // participants are cached by eventId
     public List<EventParticipant> getEventParticipants()
     {
-        return eventParticipantDao.getByEvent(event.getId());
+        Date start = new Date();
+        List<EventParticipant> participants = PARTICIPANT_CACHE.get(event, org.getId());
+        if (participants != null) { return participants; }
+
+        participants = eventParticipantDao.getByEvent(event.getId());
+        PARTICIPANT_CACHE.put(event, participants, org.getId(), start);
+
+        return participants;
     }
+
     public void save(EventParticipant participant)
     {
         eventParticipantDao.save(participant);

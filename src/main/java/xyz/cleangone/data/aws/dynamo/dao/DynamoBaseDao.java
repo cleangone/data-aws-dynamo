@@ -7,8 +7,10 @@ import com.amazonaws.services.dynamodbv2.datamodeling.S3Link;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import xyz.cleangone.data.aws.AwsClientFactory;
 import xyz.cleangone.data.aws.dynamo.entity.base.BaseEntity;
+import xyz.cleangone.data.aws.dynamo.entity.base.EntityLastTouched;
+import xyz.cleangone.data.aws.dynamo.entity.base.EntityType;
 import xyz.cleangone.data.aws.dynamo.entity.base.OrgLastTouched;
-import xyz.cleangone.data.cache.EntityLastTouched;
+import xyz.cleangone.data.cache.EntityLastTouchedCache;
 import xyz.cleangone.util.CleangoneEnv;
 
 import java.util.HashMap;
@@ -16,7 +18,7 @@ import java.util.Map;
 
 public class DynamoBaseDao <T extends BaseEntity>
 {
-    protected EntityLastTouched entityLastTouched = EntityLastTouched.getEntityLastTouched();
+    protected EntityLastTouchedCache entityLastTouchedCache = EntityLastTouchedCache.getEntityLastTouchedCache();
     protected DynamoDBMapper mapper;
 
     public DynamoBaseDao()
@@ -36,22 +38,25 @@ public class DynamoBaseDao <T extends BaseEntity>
         mapper.save(object);
     }
 
-    public void saveLastTouch(String orgId)
+    public EntityLastTouched getEntityLastTouched(String entityId)
     {
-        mapper.save(new OrgLastTouched(orgId));
+        // look up the lastTouch by the primary id, which is the entityId
+        return mapper.load(EntityLastTouched.class, entityId);
     }
 
-    public OrgLastTouched getLastTouch(String orgId)
+    public void setEntityLastTouched(String entityId, EntityType entityType)
     {
-        // look up the lastTouch by the primary id, which is the orgId
-        return mapper.load(OrgLastTouched.class, orgId);
+        EntityLastTouched lastTouched = getEntityLastTouched(entityId);
+        if (lastTouched == null) { lastTouched = new EntityLastTouched(entityId); }
+
+        lastTouched.setTouchDate(entityType);
+        mapper.save(lastTouched);
     }
 
     public void delete(T object)
     {
         mapper.delete(object);
     }
-
 
     public S3Link createS3Link(String filePath)
     {

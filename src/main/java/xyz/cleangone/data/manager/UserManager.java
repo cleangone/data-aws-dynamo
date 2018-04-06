@@ -6,6 +6,7 @@ import xyz.cleangone.data.aws.dynamo.dao.UserDao;
 import xyz.cleangone.data.aws.dynamo.dao.PersonDao;
 import xyz.cleangone.data.aws.dynamo.dao.UserTokenDao;
 import xyz.cleangone.data.aws.dynamo.entity.organization.EventParticipant;
+import xyz.cleangone.data.aws.dynamo.entity.organization.OrgTag;
 import xyz.cleangone.data.aws.dynamo.entity.organization.Organization;
 import xyz.cleangone.data.aws.dynamo.entity.person.Person;
 import xyz.cleangone.data.aws.dynamo.entity.person.User;
@@ -77,13 +78,13 @@ public class UserManager
         return (user.isSuper() || (user.getOrgId().equals(org.getId()) &&  user.isAdmin()));
     }
 
-    public boolean userHasEventAdmin(Organization org, List<String> tagIds)
+    public boolean userHasEventAdmin(Organization org, List<OrgTag> eventAdminRoleTags)
     {
         if (user == null || !user.getOrgId().equals(org.getId())) { return false; }
 
-        for (String tagId : tagIds)
+        for (OrgTag tag : eventAdminRoleTags)
         {
-            if (user.getTagIds().contains(tagId)) { return true; }
+            if (user.getTagIds().contains(tag.getId())) { return true; }
         }
 
         return false;

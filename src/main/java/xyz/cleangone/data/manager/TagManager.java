@@ -2,6 +2,8 @@ package xyz.cleangone.data.manager;
 
 import xyz.cleangone.data.aws.dynamo.dao.TagDao;
 import xyz.cleangone.data.aws.dynamo.entity.base.BaseEntity;
+import xyz.cleangone.data.aws.dynamo.entity.base.EntityType;
+import xyz.cleangone.data.aws.dynamo.entity.base.OrgLastTouched;
 import xyz.cleangone.data.aws.dynamo.entity.organization.OrgEvent;
 import xyz.cleangone.data.aws.dynamo.entity.organization.Organization;
 import xyz.cleangone.data.aws.dynamo.entity.organization.OrgTag;
@@ -15,7 +17,7 @@ import static java.util.Objects.requireNonNull;
 
 public class TagManager
 {
-    private static final EntityCache<OrgTag> TAG_CACHE = new EntityCache<>();
+    public static final EntityCache<OrgTag> TAG_CACHE = new EntityCache<>(EntityType.Tag);
     private final TagDao tagDao;
 
     private Organization org;
@@ -28,11 +30,13 @@ public class TagManager
     // no external entity should want all the diff tag types mixed together
     private List<OrgTag> getTags()
     {
-        List<OrgTag> tags = TAG_CACHE.get(org.getId());
+        Date start = new Date();
+        List<OrgTag> tags = TAG_CACHE.get(org);
         if (tags != null) { return tags; }
 
         tags = new ArrayList<>(tagDao.getByOrg(org.getId()));
         tags.sort((tag1, tag2) -> tag1.compareTo(tag2));
+        TAG_CACHE.put(org, tags, start);
         return tags;
     }
 
@@ -112,19 +116,17 @@ public class TagManager
             .collect(Collectors.toList());
     }
 
-    public List<String> getEventAdminRoleTagIds()
+    public List<OrgTag> getEventAdminRoleTags()
     {
         return getTags(OrgTag.TagType.UserRole).stream()
             .filter(t -> t.getEventId() != null)
             .filter(t -> OrgTag.ADMIN_ROLE_NAME.equals(t.getName()))
-            .map(OrgTag::getId)
             .collect(Collectors.toList());
     }
 
     public Map<String, OrgTag> getEventAdminRoleTagsById()
     {
-        List<OrgTag> eventAdminRoleTags = getTags(getEventAdminRoleTagIds());
-        return eventAdminRoleTags.stream()
+        return getEventAdminRoleTags().stream()
             .collect(Collectors.toMap(BaseEntity::getId, Function.identity()));
     }
 

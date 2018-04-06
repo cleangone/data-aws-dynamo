@@ -2,6 +2,8 @@ package xyz.cleangone.data.manager.event;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.S3Link;
 import xyz.cleangone.data.aws.dynamo.dao.*;
+import xyz.cleangone.data.aws.dynamo.entity.base.EntityType;
+import xyz.cleangone.data.aws.dynamo.entity.base.OrgLastTouched;
 import xyz.cleangone.data.aws.dynamo.entity.item.CatalogItem;
 import xyz.cleangone.data.aws.dynamo.entity.organization.*;
 import xyz.cleangone.data.cache.EntityCache;
@@ -9,13 +11,14 @@ import xyz.cleangone.data.manager.ImageContainerManager;
 import xyz.cleangone.data.manager.ImageManager;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 
 public class ItemManager implements ImageContainerManager
 {
-    private static final EntityCache<CatalogItem> ITEM_CACHE = new EntityCache<>();
+    private static final EntityCache<CatalogItem> ITEM_CACHE = new EntityCache<>(EntityType.Item);
 
     private final CatalogItemDao itemDao = new CatalogItemDao();
 
@@ -40,12 +43,13 @@ public class ItemManager implements ImageContainerManager
 
     private List<CatalogItem> getOrgItems()
     {
-        List<CatalogItem> items = ITEM_CACHE.get(org.getId());
+        Date start = new Date();
+        List<CatalogItem> items = ITEM_CACHE.get(org);
         if (items != null) { return items; }
 
         items = itemDao.getByOrg(org.getId());
         if (items == null) { items = new ArrayList<>(); }
-        ITEM_CACHE.set(items, org.getId());
+        ITEM_CACHE.put(org, items, start);
 
         return items;
     }
