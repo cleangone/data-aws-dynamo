@@ -6,6 +6,7 @@ public enum ActionType
     FulfilledPledge,
     Pledged,
     Purchased,
+    Bid,
     Enabled,
     Disabled
 }

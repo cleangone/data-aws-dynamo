@@ -4,6 +4,7 @@ import xyz.cleangone.data.aws.dynamo.dao.ActionDao;
 import xyz.cleangone.data.aws.dynamo.entity.action.Action;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityType;
 import xyz.cleangone.data.aws.dynamo.entity.item.CartItem;
+import xyz.cleangone.data.aws.dynamo.entity.item.PurchaseItem;
 import xyz.cleangone.data.aws.dynamo.entity.organization.EventParticipant;
 import xyz.cleangone.data.aws.dynamo.entity.organization.OrgEvent;
 import xyz.cleangone.data.aws.dynamo.entity.organization.Organization;
@@ -87,6 +88,13 @@ public class ActionManager
         if (item.isDonation()) { return createDonation(user, item); }
         else if (item.isPledgeFulfillment()) { return createPledgeFulfillment(user, item); }
         else return createPurchase(user, item);
+    }
+
+    // todo - lots of problems here...
+    public Action createBid(User user, PurchaseItem item, OrgEvent event)
+    {
+        return createAction(user, event, ActionType.Bid, item.getPrice())
+            .withDescription(item.getName());
     }
 
     private Action createDonation(User user, CartItem item)
