@@ -13,6 +13,8 @@ import static java.util.Objects.requireNonNull;
 @DynamoDBTable(tableName="PurchaseItem")
 public class PurchaseItem extends BaseItem
 {
+
+    // todo - bidding goes in CatalogItem
     public enum SaleType { Purchase, Bid }
 
     public static final EntityField IS_BID_FIELD = new EntityField("item.isBid", "Is Bid");

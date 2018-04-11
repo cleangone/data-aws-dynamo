@@ -3,12 +3,18 @@ package xyz.cleangone.data.aws.dynamo.dao;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityType;
 import xyz.cleangone.data.aws.dynamo.entity.base.OrgLastTouched;
+import xyz.cleangone.data.aws.dynamo.entity.bid.ItemBid;
 import xyz.cleangone.data.aws.dynamo.entity.item.CatalogItem;
 
 import java.util.List;
 
 public class CatalogItemDao extends DynamoBaseDao<CatalogItem>
 {
+    public CatalogItem getById(String id)
+    {
+        return mapper.load(CatalogItem.class, id);
+    }
+
     public List<CatalogItem> getByOrg(String eventId)
     {
         DynamoDBScanExpression scanExpression = buildEqualsScanExpression("OrgId", eventId);

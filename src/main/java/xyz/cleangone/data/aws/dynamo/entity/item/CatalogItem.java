@@ -6,6 +6,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import com.amazonaws.services.dynamodbv2.datamodeling.S3Link;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityField;
 import xyz.cleangone.data.aws.dynamo.entity.base.ImageContainer;
+import xyz.cleangone.data.aws.dynamo.entity.bid.ItemBid;
 import xyz.cleangone.data.aws.dynamo.entity.organization.OrgTag;
 
 import java.util.ArrayList;
@@ -23,8 +24,9 @@ public class CatalogItem extends PurchaseItem implements ImageContainer
 
     private String orgId;
     private List<S3Link> images;
-
     private List<String> categoryIds;
+    private String highBidId;
+
     private String categoriesCsv; // transient
 
     public CatalogItem() {}
@@ -89,6 +91,15 @@ public class CatalogItem extends PurchaseItem implements ImageContainer
         categoryIds.remove(categoryId);
     }
 
+    @DynamoDBAttribute(attributeName="HighBidId")
+    public String getHighBidId()
+    {
+        return highBidId;
+    }
+    public void setHighBidId(String highBidId)
+    {
+        this.highBidId = highBidId;
+    }
 
     @DynamoDBIgnore
     public String getCategoriesCsv() { return categoriesCsv; }

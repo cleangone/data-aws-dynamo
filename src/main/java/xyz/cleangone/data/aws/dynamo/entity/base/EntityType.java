@@ -6,6 +6,7 @@ public enum EntityType
     Event,
     Person,
     Item,
+    Bid,
     User,
     Tag,
     PersonTag,
