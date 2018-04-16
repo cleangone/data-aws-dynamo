@@ -128,7 +128,7 @@ public class BidManager
         return new BidStatus(userBid, currentHighBid);
     }
 
-    private UserBid getUserBid(User user, CatalogItem item)
+    public UserBid getUserBid(User user, CatalogItem item)
     {
         List<UserBid> userBids = userBidDao.getByItemId(item.getId()).stream()
             .filter(b -> b.getUserId().equals(user.getId()))

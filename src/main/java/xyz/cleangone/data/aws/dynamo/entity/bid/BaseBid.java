@@ -41,6 +41,20 @@ public class BaseBid extends BaseEntity
         return currAmount.compareTo(amount) > 0;
     }
 
+    @DynamoDBIgnore
+    public String getDisplayMaxAmount()
+    {
+        return getDisplayAmount(maxAmount);
+    }
+    public String getDisplayCurrAmount()
+    {
+        return getDisplayAmount(currAmount);
+    }
+    private String getDisplayAmount(BigDecimal amount)
+    {
+        return amount == null ? "" : "$" + amount;
+    }
+
     @DynamoDBAttribute(attributeName="ItemId")
     public String getItemId()
     {
