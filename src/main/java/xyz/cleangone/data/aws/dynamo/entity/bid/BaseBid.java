@@ -46,10 +46,14 @@ public class BaseBid extends BaseEntity
     {
         return getDisplayAmount(maxAmount);
     }
+
+    @DynamoDBIgnore
     public String getDisplayCurrAmount()
     {
         return getDisplayAmount(currAmount);
     }
+
+    @DynamoDBIgnore
     private String getDisplayAmount(BigDecimal amount)
     {
         return amount == null ? "" : "$" + amount;
