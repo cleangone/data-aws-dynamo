@@ -3,12 +3,12 @@ package xyz.cleangone.data.manager;
 import xyz.cleangone.data.aws.dynamo.dao.ActionDao;
 import xyz.cleangone.data.aws.dynamo.entity.action.Action;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityType;
+import xyz.cleangone.data.aws.dynamo.entity.bid.UserBid;
 import xyz.cleangone.data.aws.dynamo.entity.item.CartItem;
 import xyz.cleangone.data.aws.dynamo.entity.item.PurchaseItem;
 import xyz.cleangone.data.aws.dynamo.entity.organization.EventParticipant;
 import xyz.cleangone.data.aws.dynamo.entity.organization.OrgEvent;
 import xyz.cleangone.data.aws.dynamo.entity.organization.Organization;
-import xyz.cleangone.data.aws.dynamo.entity.person.Person;
 import xyz.cleangone.data.aws.dynamo.entity.person.User;
 import xyz.cleangone.data.aws.dynamo.entity.action.ActionType;
 import xyz.cleangone.data.aws.dynamo.entity.purchase.Cart;
@@ -90,10 +90,9 @@ public class ActionManager
         else return createPurchase(user, item);
     }
 
-    // todo - lots of problems here...
-    public Action createBid(User user, PurchaseItem item, OrgEvent event)
+    public Action createBid(User user, UserBid userBid, PurchaseItem item, OrgEvent event)
     {
-        return createAction(user, event, ActionType.Bid, item.getPrice())
+        return createAction(user, event, ActionType.Bid, userBid.getMaxAmount())
             .withDescription(item.getName());
     }
 

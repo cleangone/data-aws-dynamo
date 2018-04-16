@@ -2,8 +2,6 @@ package xyz.cleangone.data.aws.dynamo.dao;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityType;
-import xyz.cleangone.data.aws.dynamo.entity.base.OrgLastTouched;
-import xyz.cleangone.data.aws.dynamo.entity.bid.ItemBid;
 import xyz.cleangone.data.aws.dynamo.entity.item.CatalogItem;
 
 import java.util.List;
@@ -25,6 +23,7 @@ public class CatalogItemDao extends DynamoBaseDao<CatalogItem>
     {
         super.save(item);
         setEntityLastTouched(item.getOrgId(), EntityType.Item);
+        setEntityLastTouched(item.getId(), EntityType.Bid);
     }
 
     public void delete(CatalogItem item)

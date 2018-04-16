@@ -3,7 +3,6 @@ package xyz.cleangone.data.manager;
 import com.amazonaws.services.dynamodbv2.datamodeling.S3Link;
 import xyz.cleangone.data.aws.dynamo.dao.*;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityType;
-import xyz.cleangone.data.aws.dynamo.entity.base.OrgLastTouched;
 import xyz.cleangone.data.aws.dynamo.entity.item.CatalogItem;
 import xyz.cleangone.data.aws.dynamo.entity.organization.EventDate;
 import xyz.cleangone.data.aws.dynamo.entity.organization.EventParticipant;

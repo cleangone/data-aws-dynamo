@@ -1,6 +1,5 @@
 package xyz.cleangone.data.aws.dynamo.dao;
 
-import xyz.cleangone.data.aws.dynamo.entity.base.OrgLastTouched;
 import xyz.cleangone.data.aws.dynamo.entity.organization.OrgEvent;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityType;
 

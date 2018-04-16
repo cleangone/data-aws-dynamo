@@ -1,4 +1,4 @@
-package xyz.cleangone.data.manager.event;
+package xyz.cleangone.data.processor;
 
 import xyz.cleangone.data.aws.dynamo.dao.CatalogItemDao;
 import xyz.cleangone.data.aws.dynamo.dao.ItemBidDao;
@@ -7,33 +7,30 @@ import xyz.cleangone.data.aws.dynamo.entity.bid.BidUtils;
 import xyz.cleangone.data.aws.dynamo.entity.bid.ItemBid;
 import xyz.cleangone.data.aws.dynamo.entity.bid.UserBid;
 import xyz.cleangone.data.aws.dynamo.entity.item.CatalogItem;
-import xyz.cleangone.data.aws.dynamo.entity.item.PurchaseItem;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 
-// to be moved to async lambda
-public class BidEngine
+public class BidProcessor
 {
     private final UserBidDao  userBidDao = new UserBidDao();
     private final ItemBidDao  itemBidDao = new ItemBidDao();
     private final CatalogItemDao itemDao = new CatalogItemDao();
+    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     // first bid on item
-    public void processFirstBid(String userBidId)
+    public void processFirstBid(UserBid userBid, CatalogItem item)
     {
-        UserBid userBid = userBidDao.getById(userBidId);
-        highBid(userBid);
+        placeHighBid(userBid, item);
     }
 
     // current high bid will be increased, but stay as high bid
-    public void incrementExistingHighBid(String userBidId, String currentHighItemBidId)
+    public void incrementExistingHighBid(UserBid userBid, ItemBid currentHighBid, CatalogItem item)
     {
-        UserBid userBid = userBidDao.getById(userBidId);
-        ItemBid currentHighBid = itemBidDao.getById(currentHighItemBidId);
-
         // current item bid was outbid
         outbid(currentHighBid);
 
@@ -51,26 +48,36 @@ public class BidEngine
         save(currentHighUserBid);
 
         // current high userBid generates a new item high bid
-        highBid(currentHighUserBid);
+        placeHighBid(currentHighUserBid, item);
     }
 
     // current user high bid was outbid
-    public void processNewHighBid(String userBidId, String currentHighItemBidId)
+    public void processNewHighBid(UserBid userBid, ItemBid currentHighBid, CatalogItem item)
     {
-        UserBid userBid = userBidDao.getById(userBidId);
-        ItemBid currentHighBid = itemBidDao.getById(currentHighItemBidId);
-
         // current item bid was outbid
         outbid(currentHighBid);
 
-        // previous high bidder bids its max
+        // previous high bidder bids its max unless already at max
         UserBid currentHighUserBid = userBidDao.getById(currentHighBid.getUserBidId());
-        save(new ItemBid(currentHighUserBid, currentHighBid.getMaxAmount(), false));
+        if (!currentHighUserBid.atMaxBid()) { save(new ItemBid(currentHighUserBid, currentHighBid.getMaxAmount(), false)); }
         outbid(currentHighUserBid);
 
         // new bid generated a new high item bid
-        highBid(userBid);
+        placeHighBid(userBid, item);
      }
+
+    public void cleanupUserBids(List<UserBid> bids, UserBid highBid)
+    {
+        schedule(new UserBidFixer(bids, highBid, userBidDao));
+    }
+    public void cleanupHighBids(List<ItemBid> highBids, ItemBid highestBid)
+    {
+        schedule(new ItemBidFixer(highBids, highestBid, itemBidDao));
+    }
+    private void schedule(Runnable runnable)
+    {
+        scheduler.schedule(runnable, 1, SECONDS);
+    }
 
     private void outbid(ItemBid bid)
     {
@@ -85,56 +92,18 @@ public class BidEngine
         save(bid);
     }
 
-    private void highBid(UserBid userBid)
+    private void placeHighBid(UserBid userBid, CatalogItem item)
     {
         ItemBid bid = save(new ItemBid(userBid, userBid.getCurrAmount(), true));
 
-        CatalogItem item = itemDao.getById(bid.getItemId());
-        item.setPrice(bid.getCurrAmount());
-        item.setHighBidId(bid.getId());
+        //CatalogItem item = itemDao.getById(bid.getItemId());
+        item.bid(bid);
         save(item);
     }
 
-
-    // todo - do cleanup in bidEngine
-    private ItemBid getHighBid(PurchaseItem item)
-    {
-        // should be only one, but be safe
-        List<ItemBid> itemBids = itemBidDao.getByItemId(item.getId());
-        List<ItemBid> highBids = itemBids.stream()
-            .filter(ItemBid::getIsHighBid)
-            .collect(Collectors.toList());
-        if (highBids.size() == 0) { return null; }
-        else if (highBids.size() == 1) { return highBids.get(0); }
-
-
-        // should only be one - fix error condition
-        ItemBid highestBid = null;
-        for (ItemBid bid : highBids)
-        {
-            if (highestBid == null || bid.getCurrAmount().compareTo(highestBid.getCurrAmount()) > 0)
-            {
-                highestBid = bid;
-            }
-        }
-
-        for (ItemBid bid : highBids)
-        {
-            if (bid != highestBid)
-            {
-                // todo - need to also look up userBid
-                bid.setIsHighBid(false);
-                save(bid);
-            }
-        }
-
-        return highestBid;
-    }
-
-    private UserBid save(UserBid userBid)
+    private void save(UserBid userBid)
     {
         userBidDao.save(userBid);
-        return userBid;
     }
 
     private ItemBid save(ItemBid itemBid)

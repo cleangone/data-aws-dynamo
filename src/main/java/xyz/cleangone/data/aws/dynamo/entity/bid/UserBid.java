@@ -1,5 +1,6 @@
 package xyz.cleangone.data.aws.dynamo.entity.bid;
 
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBIgnore;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import xyz.cleangone.data.aws.dynamo.entity.item.CatalogItem;
 import xyz.cleangone.data.aws.dynamo.entity.person.User;
@@ -15,6 +16,11 @@ public class UserBid extends BaseBid
         super(item.getId(), user.getId(), maxAmount, currAmount, isHighBid);
     }
 
+    @DynamoDBIgnore
+    public boolean atMaxBid()
+    {
+        return maxAmountEQ(currAmount);
+    }
 }
 
 

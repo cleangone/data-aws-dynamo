@@ -1,9 +1,6 @@
 package xyz.cleangone.data.aws.dynamo.entity.item;
 
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperFieldModel;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTyped;
+import com.amazonaws.services.dynamodbv2.datamodeling.*;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityField;
 
 import java.util.Date;
@@ -13,7 +10,6 @@ import static java.util.Objects.requireNonNull;
 @DynamoDBTable(tableName="PurchaseItem")
 public class PurchaseItem extends BaseItem
 {
-
     // todo - bidding goes in CatalogItem
     public enum SaleType { Purchase, Bid }
 
@@ -22,11 +18,11 @@ public class PurchaseItem extends BaseItem
     public static final EntityField AVAIL_START_FIELD = new EntityField("item.availabilityStart", "Start Date");
     public static final EntityField AVAIL_END_FIELD = new EntityField("item.availabilityEnd", "End Date");
 
-    private String eventId;
-    private SaleType saleType = SaleType.Purchase;
-    private Integer quantity;
-    private Date availabilityStart;
-    private Date availabilityEnd;
+    protected String eventId;
+    protected SaleType saleType = SaleType.Purchase;
+    protected Integer quantity;
+    protected Date availabilityStart;
+    protected Date availabilityEnd;
 
     public PurchaseItem() {}
     public PurchaseItem(String name, String eventId)
@@ -72,6 +68,20 @@ public class PurchaseItem extends BaseItem
         else if (AVAIL_END_FIELD.equals(field)) setAvailabilityEnd(value);
         else super.setDate(field, value);
     }
+
+    @DynamoDBIgnore
+    public boolean isBid()
+    {
+        return saleType == PurchaseItem.SaleType.Bid;
+    }
+
+    @DynamoDBIgnore
+    public boolean isAvailable()
+    {
+        return ((quantity == null || quantity > 0) &&
+            (availabilityStart == null || availabilityStart.before(new Date())) &&
+            (availabilityEnd == null || availabilityEnd.after(new Date())));
+     }
 
     @DynamoDBAttribute(attributeName = "EventId")
     public String getEventId()

@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 @DynamoDBTable(tableName="ItemBid")
 public class ItemBid extends BaseBid
 {
-    private String userBidId;
+    private String userBidId;  // user may delete userBid if it is not the high bid
 
     public ItemBid() {}
     public ItemBid(UserBid userBid, BigDecimal currAmount, boolean isHighBid)

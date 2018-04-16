@@ -9,7 +9,6 @@ import xyz.cleangone.data.aws.AwsClientFactory;
 import xyz.cleangone.data.aws.dynamo.entity.base.BaseEntity;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityLastTouched;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityType;
-import xyz.cleangone.data.aws.dynamo.entity.base.OrgLastTouched;
 import xyz.cleangone.data.cache.EntityLastTouchedCache;
 import xyz.cleangone.util.CleangoneEnv;
 

@@ -13,7 +13,7 @@ public class EntityLastTouched extends BaseEntity
 
     public EntityLastTouched() { }
 
-    // orgLastTouched.id is the entityId
+    // EntityLastTouched.id is the entityId
     public EntityLastTouched(String entityId)
     {
         setId(entityId);

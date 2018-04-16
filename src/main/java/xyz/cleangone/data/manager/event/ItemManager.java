@@ -3,7 +3,6 @@ package xyz.cleangone.data.manager.event;
 import com.amazonaws.services.dynamodbv2.datamodeling.S3Link;
 import xyz.cleangone.data.aws.dynamo.dao.*;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityType;
-import xyz.cleangone.data.aws.dynamo.entity.base.OrgLastTouched;
 import xyz.cleangone.data.aws.dynamo.entity.item.CatalogItem;
 import xyz.cleangone.data.aws.dynamo.entity.organization.*;
 import xyz.cleangone.data.cache.EntityCache;
@@ -26,6 +25,7 @@ public class ItemManager implements ImageContainerManager
     private OrgEvent event;
     private CatalogItem item;
 
+    public ItemManager() { }
     public ItemManager(Organization org, OrgEvent event, CatalogItem item)
     {
         this.org = org;

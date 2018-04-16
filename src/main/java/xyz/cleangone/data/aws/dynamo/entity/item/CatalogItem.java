@@ -9,10 +9,7 @@ import xyz.cleangone.data.aws.dynamo.entity.base.ImageContainer;
 import xyz.cleangone.data.aws.dynamo.entity.bid.ItemBid;
 import xyz.cleangone.data.aws.dynamo.entity.organization.OrgTag;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
@@ -21,6 +18,7 @@ import static java.util.Objects.requireNonNull;
 public class CatalogItem extends PurchaseItem implements ImageContainer
 {
     public static final EntityField CATEGORIES_FIELD = new EntityField("item.categories", "Categories");
+    public static long ONE_MINUTE = 60*1000;
 
     private String orgId;
     private List<S3Link> images;
@@ -37,9 +35,18 @@ public class CatalogItem extends PurchaseItem implements ImageContainer
     }
 
     @DynamoDBIgnore
-    public boolean isAvailable()
+    public void bid(ItemBid bid)
     {
-        return getQuantity() == null || getQuantity() > 0;
+        setPrice(bid.getCurrAmount());
+        setHighBidId(bid.getId());
+
+        Date now = new Date();
+        if (availabilityEnd != null &&
+            availabilityEnd.getTime() > now.getTime() - ONE_MINUTE &&
+            availabilityEnd.getTime() < now.getTime())
+        {
+            setAvailabilityEnd(new Date(now.getTime() + ONE_MINUTE));
+        }
     }
 
     @DynamoDBAttribute(attributeName = "OrgId")

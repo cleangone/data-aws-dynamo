@@ -23,6 +23,7 @@ public class ItemBidDao extends DynamoBaseDao<ItemBid>
     {
         super.save(itemBid);
         entityLastTouchedCache.touch(itemBid.getItemId(), EntityType.Bid);
+        setEntityLastTouched(itemBid.getItemId(), EntityType.Bid);
     }
 }
 
