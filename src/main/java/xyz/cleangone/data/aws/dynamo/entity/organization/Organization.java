@@ -18,6 +18,8 @@ public class Organization extends BaseOrg implements ImageContainer
 
     public static final EntityField IATS_AGENT_CODE_FIELD = new EntityField("org.iaatsAgentCode", "iATS Agent Code");
     public static final EntityField IATS_PASSWORD_FIELD = new EntityField("org.iatsPassord", "iATS Password");
+    public static final EntityField EVENT_CAPTION_FIELD = new EntityField("org.eventCaption", "Event Caption");
+    public static final EntityField EVENT_CAPTION_PLURAL_FIELD = new EntityField("org.eventCaptionPlural", "Event Caption Plural");
 
     private int leftColWidth;
     private int centerColWidth;
@@ -26,6 +28,8 @@ public class Organization extends BaseOrg implements ImageContainer
     private PaymentProcessorType paymentProcessorType;
     private String paymentProcessorUser;
     private String encryptedPaymentProcessorAuth;
+    private String eventCaption;
+    private String eventCaptionPlural;
 
     public Organization()
     {
@@ -41,6 +45,8 @@ public class Organization extends BaseOrg implements ImageContainer
     {
         if (IATS_AGENT_CODE_FIELD.equals(field)) return getPaymentProcessorUser();
         else if (IATS_PASSWORD_FIELD.equals(field)) return getPaymentProcessorAuth();  // todo - do we want this available?
+        else if (EVENT_CAPTION_FIELD.equals(field)) return getEventCaption();
+        else if (EVENT_CAPTION_PLURAL_FIELD.equals(field)) return getEventCaptionPlural();
         else return super.get(field);
     }
 
@@ -48,6 +54,8 @@ public class Organization extends BaseOrg implements ImageContainer
     {
         if (IATS_AGENT_CODE_FIELD.equals(field)) setPaymentProcessorUser(value);
         else if (IATS_PASSWORD_FIELD.equals(field)) setPaymentProcessorAuth(value);
+        else if (EVENT_CAPTION_FIELD.equals(field)) setEventCaption(value);
+        else if (EVENT_CAPTION_PLURAL_FIELD.equals(field)) setEventCaptionPlural(value);
         else super.set(field, value);
     }
 
@@ -155,6 +163,26 @@ public class Organization extends BaseOrg implements ImageContainer
     public void setEncryptedPaymentProcessorAuth(String encryptedPaymentProcessorAuth)
     {
         this.encryptedPaymentProcessorAuth = encryptedPaymentProcessorAuth;
+    }
+
+    @DynamoDBAttribute(attributeName = "EventCaption")
+    public String getEventCaption()
+    {
+        return eventCaption;
+    }
+    public void setEventCaption(String eventCaption)
+    {
+        this.eventCaption = eventCaption;
+    }
+
+    @DynamoDBAttribute(attributeName = "EventCaptionPlural")
+    public String getEventCaptionPlural()
+    {
+        return eventCaptionPlural;
+    }
+    public void setEventCaptionPlural(String eventCaptionPlural)
+    {
+        this.eventCaptionPlural = eventCaptionPlural;
     }
 
     public String getS3LinkPrefix(Organization org, String filePath)

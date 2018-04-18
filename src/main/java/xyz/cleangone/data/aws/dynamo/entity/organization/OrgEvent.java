@@ -11,7 +11,7 @@ import static java.util.Objects.requireNonNull;
 @DynamoDBTable(tableName="Event")
 public class OrgEvent extends BaseOrg implements ImageContainer
 {
-    public static final EntityField DISPLAY_COL_FIELD = new EntityField("orgEvent.displayCol", "Display Column");
+    public static final EntityField DISPLAY_COL_FIELD = new EntityField("orgEvent.displayCol", "Main Page Display Col");
     public static final EntityField DISPLAY_ORDER_FIELD = new EntityField("orgEvent.displayOrder", "Display Order");
     public static final EntityField USE_ORG_BANNER_FIELD = new EntityField("orgEvent.useOrgBanner", "Use Organization Banner");
     public static final EntityField BLURB_HTML_FIELD = new EntityField("orgEvent.blurbHtml", "Blurb HTML");

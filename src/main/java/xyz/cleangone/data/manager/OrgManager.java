@@ -107,6 +107,14 @@ public class OrgManager implements ImageContainerManager
         return userDao.getByOrg(getOrgId());
     }
 
+    public Organization createOrg(String name)
+    {
+        Organization newOrg = new Organization(name);
+        save(newOrg);
+
+        return newOrg;
+    }
+
     public void save()
     {
         if (org != null) { orgDao.save(org); }
