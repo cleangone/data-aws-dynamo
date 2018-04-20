@@ -8,6 +8,7 @@ import xyz.cleangone.data.aws.dynamo.dao.PersonDao;
 import xyz.cleangone.data.aws.dynamo.dao.UserDao;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityLastTouched;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityType;
+import xyz.cleangone.data.aws.dynamo.entity.image.ImageType;
 import xyz.cleangone.data.aws.dynamo.entity.organization.Organization;
 import xyz.cleangone.data.aws.dynamo.entity.person.Person;
 import xyz.cleangone.data.aws.dynamo.entity.person.User;
@@ -177,13 +178,17 @@ public class OrgManager implements ImageContainerManager
         return orgDao.createS3Link(fullFilePath);
     }
 
-    public String getPrimaryUrl()
+    public String getImageUrl(ImageType imageType)
     {
-        return getOrg().getBannerUrl();
+        if (imageType == ImageType.Banner) { return getOrg().getBannerUrl(); }
+        else if (imageType == ImageType.Blurb) { return getOrg().getBlurbBannerUrl(); }
+        return null;
     }
-    public void setPrimaryUrl(String bannerUrl)
+
+    public void setImageUrl(ImageType imageType, String imageUrl)
     {
-        getOrg().setBannerUrl(bannerUrl);
+        if (imageType == ImageType.Banner) { getOrg().setBannerUrl(imageUrl); }
+        else if (imageType == ImageType.Blurb) { getOrg().setBlurbBannerUrl(imageUrl); }
     }
 
     public ActionManager getActionManager()

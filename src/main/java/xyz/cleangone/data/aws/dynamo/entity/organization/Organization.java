@@ -2,7 +2,7 @@ package xyz.cleangone.data.aws.dynamo.entity.organization;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.*;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityField;
-import xyz.cleangone.data.aws.dynamo.entity.base.ImageContainer;
+import xyz.cleangone.data.aws.dynamo.entity.image.ImageContainer;
 import xyz.cleangone.util.Crypto;
 
 import java.util.Objects;

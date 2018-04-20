@@ -1,6 +1,8 @@
 package xyz.cleangone.data.manager;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.S3Link;
+import xyz.cleangone.data.aws.dynamo.entity.image.ImageType;
+
 import java.util.List;
 
 public interface ImageContainerManager
@@ -13,8 +15,8 @@ public interface ImageContainerManager
     void addImage(S3Link image);
     void deleteImage(S3Link image);
 
-    String getPrimaryUrl();
-    void setPrimaryUrl(String bannerUrl);
+    String getImageUrl(ImageType imageType);
+    void setImageUrl(ImageType imageType, String imageUrl);
 
     void save();
 }

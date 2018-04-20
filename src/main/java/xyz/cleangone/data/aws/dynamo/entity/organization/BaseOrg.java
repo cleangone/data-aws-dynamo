@@ -6,7 +6,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import com.amazonaws.services.dynamodbv2.datamodeling.S3Link;
 import xyz.cleangone.data.aws.dynamo.entity.base.BaseMixinEntity;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityField;
-import xyz.cleangone.data.aws.dynamo.entity.base.ImageContainer;
+import xyz.cleangone.data.aws.dynamo.entity.image.ImageContainer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +15,6 @@ import java.util.List;
 public class BaseOrg extends BaseMixinEntity implements ImageContainer
 {
     public static final EntityField TAG_FIELD = new EntityField("baseOrg.tag", "Tag Name");
-    public static final EntityField INTRO_HTML_FIELD = new EntityField("baseOrg.introHtml", "Intro HTML");
     public static final EntityField BANNER_URL_FIELD = new EntityField("baseOrg.bannerUrl", "Banner URL");
     public static final EntityField BANNER_HTML_FIELD = new EntityField("baseOrg.bannerHtml", "Text HTML");
     public static final EntityField BANNER_BKGND_COLOR_FIELD = new EntityField("baseOrg.bannerBackgroundColor", "Background Color");
@@ -26,9 +25,10 @@ public class BaseOrg extends BaseMixinEntity implements ImageContainer
     public static final EntityField NAV_BKGND_COLOR_FIELD = new EntityField("baseOrg.navBackgroundColor", "Background Color");
     public static final EntityField NAV_TEXT_COLOR_FIELD = new EntityField("baseOrg.NavTextColor", "Text Color");
     public static final EntityField NAV_SELECTED_TEXT_COLOR_FIELD = new EntityField("baseOrg.NavSelectedTextColor", "Selected Text Color");
+    public static final EntityField INTRO_HTML_FIELD = new EntityField("baseOrg.introHtml", "Intro HTML");
+    public static final EntityField BLURB_HTML_FIELD = new EntityField("orgEvent.blurbHtml", "Blurb HTML");
 
     private String tag;
-    private String introHtml;
     private List<S3Link> images;
     private String bannerUrl;
     private String bannerHtml;
@@ -40,6 +40,9 @@ public class BaseOrg extends BaseMixinEntity implements ImageContainer
     private String navBackgroundColor;
     private String navTextColor;
     private String navSelectedTextColor;
+    private String introHtml;
+    private String blurbBannerUrl;
+    private String blurbHtml;
 
 
     public BaseOrg()
@@ -54,7 +57,6 @@ public class BaseOrg extends BaseMixinEntity implements ImageContainer
     public String get(EntityField field)
     {
         if (TAG_FIELD.equals(field)) return getTag();
-        else if (INTRO_HTML_FIELD.equals(field)) return getIntroHtml();
         else if (BANNER_URL_FIELD.equals(field)) return getBannerUrl();
         else if (BANNER_HTML_FIELD.equals(field)) return getBannerHtml();
         else if (BANNER_BKGND_COLOR_FIELD.equals(field)) return getBannerBackgroundColor();
@@ -65,13 +67,14 @@ public class BaseOrg extends BaseMixinEntity implements ImageContainer
         else if (NAV_BKGND_COLOR_FIELD.equals(field)) return getNavBackgroundColor();
         else if (NAV_TEXT_COLOR_FIELD.equals(field)) return getNavTextColor();
         else if (NAV_SELECTED_TEXT_COLOR_FIELD.equals(field)) return getNavSelectedTextColor();
+        else if (INTRO_HTML_FIELD.equals(field)) return getIntroHtml();
+        else if (BLURB_HTML_FIELD.equals(field)) return getBlurbHtml();
         else return super.get(field);
     }
 
     public void set(EntityField field, String value)
     {
         if (TAG_FIELD.equals(field)) setTag(value);
-        else if (INTRO_HTML_FIELD.equals(field)) setIntroHtml(value);
         else if (BANNER_URL_FIELD.equals(field)) setBannerUrl(value);
         else if (BANNER_HTML_FIELD.equals(field)) setBannerHtml(value);
         else if (BANNER_BKGND_COLOR_FIELD.equals(field)) setBannerBackgroundColor(value);
@@ -82,6 +85,8 @@ public class BaseOrg extends BaseMixinEntity implements ImageContainer
         else if (BAR_BKGND_COLOR_FIELD.equals(field)) setBarBackgroundColor(value);
         else if (NAV_TEXT_COLOR_FIELD.equals(field)) setNavTextColor(value);
         else if (NAV_SELECTED_TEXT_COLOR_FIELD.equals(field)) setNavSelectedTextColor(value);
+        else if (INTRO_HTML_FIELD.equals(field)) setIntroHtml(value);
+        else if (BLURB_HTML_FIELD.equals(field)) setBlurbHtml(value);
         else super.set(field, value);
     }
 
@@ -99,16 +104,6 @@ public class BaseOrg extends BaseMixinEntity implements ImageContainer
     public void setTag(String tag)
     {
         this.tag = tag;
-    }
-
-    @DynamoDBAttribute(attributeName="IntroHtml")
-    public String getIntroHtml()
-    {
-        return introHtml;
-    }
-    public void setIntroHtml(String introHtml)
-    {
-        this.introHtml = introHtml;
     }
 
     @DynamoDBAttribute(attributeName="Images")
@@ -229,6 +224,35 @@ public class BaseOrg extends BaseMixinEntity implements ImageContainer
         this.navSelectedTextColor = navSelectedTextColor;
     }
 
+    @DynamoDBAttribute(attributeName="IntroHtml")
+    public String getIntroHtml()
+    {
+        return introHtml;
+    }
+    public void setIntroHtml(String introHtml)
+    {
+        this.introHtml = introHtml;
+    }
+
+    @DynamoDBAttribute(attributeName = "BlurbBannerUrl")
+    public String getBlurbBannerUrl()
+    {
+        return blurbBannerUrl;
+    }
+    public void setBlurbBannerUrl(String blurbBannerUrl)
+    {
+        this.blurbBannerUrl = blurbBannerUrl;
+    }
+
+    @DynamoDBAttribute(attributeName = "BlurbHtml")
+    public String getBlurbHtml()
+    {
+        return blurbHtml;
+    }
+    public void setBlurbHtml(String blurbHtml)
+    {
+        this.blurbHtml = blurbHtml;
+    }
 
     @Override
     public boolean equals(Object o)

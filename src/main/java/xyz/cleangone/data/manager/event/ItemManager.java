@@ -3,6 +3,7 @@ package xyz.cleangone.data.manager.event;
 import com.amazonaws.services.dynamodbv2.datamodeling.S3Link;
 import xyz.cleangone.data.aws.dynamo.dao.*;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityType;
+import xyz.cleangone.data.aws.dynamo.entity.image.ImageType;
 import xyz.cleangone.data.aws.dynamo.entity.item.CatalogItem;
 import xyz.cleangone.data.aws.dynamo.entity.organization.*;
 import xyz.cleangone.data.cache.EntityCache;
@@ -136,15 +137,12 @@ public class ItemManager implements ImageContainerManager
         return itemDao.createS3Link(fullFilePath);
     }
 
-    public String getPrimaryUrl()
+    // todo - not used yet
+    public String getImageUrl(ImageType imageType)
     {
-        return event.getBannerUrl();
+        return null;
     }
-    public void setPrimaryUrl(String bannerUrl)
-    {
-        event.setBannerUrl(bannerUrl);
-    }
-
+    public void setImageUrl(ImageType imageType, String imageUrl) { }
 
     public CatalogItemDao getDao()
     {

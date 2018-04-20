@@ -2,7 +2,7 @@ package xyz.cleangone.data.aws.dynamo.entity.organization;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.*;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityField;
-import xyz.cleangone.data.aws.dynamo.entity.base.ImageContainer;
+import xyz.cleangone.data.aws.dynamo.entity.image.ImageContainer;
 
 import java.util.List;
 
@@ -14,7 +14,6 @@ public class OrgEvent extends BaseOrg implements ImageContainer
     public static final EntityField DISPLAY_COL_FIELD = new EntityField("orgEvent.displayCol", "Main Page Display Col");
     public static final EntityField DISPLAY_ORDER_FIELD = new EntityField("orgEvent.displayOrder", "Display Order");
     public static final EntityField USE_ORG_BANNER_FIELD = new EntityField("orgEvent.useOrgBanner", "Use Organization Banner");
-    public static final EntityField BLURB_HTML_FIELD = new EntityField("orgEvent.blurbHtml", "Blurb HTML");
     public static final EntityField DISPLAY_CATEGORIES_FIELD = new EntityField("orgEvent.displayCategories", "Display Categories");
     public static final EntityField ACCEPT_DONATIONS_FIELD = new EntityField("orgEvent.acceptDonations", "Accept Donations");
     public static final EntityField ACCEPT_PLEDGES_FIELD = new EntityField("orgEvent.acceptPledges", "Accept Per-Iteration Pledges");
@@ -32,7 +31,6 @@ public class OrgEvent extends BaseOrg implements ImageContainer
     private boolean useOrgBanner;
 
     // todo - change to personTagIds
-    private String blurbHtml;
     private List<String> tagIds; // the org-wide tags this event is interested in
     private List<String> categoryIds; // the org-wide categories this event is interested in
     private boolean displayCategories;
@@ -64,7 +62,6 @@ public class OrgEvent extends BaseOrg implements ImageContainer
     public String get(EntityField field)
     {
         if (DISPLAY_COL_FIELD.equals(field)) return getDisplayColString();
-        else if (BLURB_HTML_FIELD.equals(field)) return getBlurbHtml();
         else if (ITER_LABEL_SINGULAR_FIELD.equals(field)) return getIterationLabelSingular();
         else if (ITER_COUNT_LABEL_PLURAL_FIELD.equals(field)) return getIterationLabelPlural();
         else return super.get(field);
@@ -73,7 +70,6 @@ public class OrgEvent extends BaseOrg implements ImageContainer
     public void set(EntityField field, String value)
     {
         if (DISPLAY_COL_FIELD.equals(field)) setDisplayColString(value);
-        else if (BLURB_HTML_FIELD.equals(field)) setBlurbHtml(value);
         else if (ITER_LABEL_SINGULAR_FIELD.equals(field)) setIterationLabelSingular(value);
         else if (ITER_COUNT_LABEL_PLURAL_FIELD.equals(field)) setIterationLabelPlural(value);
         else super.set(field, value);
@@ -170,16 +166,6 @@ public class OrgEvent extends BaseOrg implements ImageContainer
     public void setUseOrgBanner(boolean useOrgBanner)
     {
         this.useOrgBanner = useOrgBanner;
-    }
-
-    @DynamoDBAttribute(attributeName = "BlurbHtml")
-    public String getBlurbHtml()
-    {
-        return blurbHtml;
-    }
-    public void setBlurbHtml(String blurbHtml)
-    {
-        this.blurbHtml = blurbHtml;
     }
 
     @DynamoDBAttribute(attributeName = "EventCompleted")
