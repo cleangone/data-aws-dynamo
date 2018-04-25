@@ -43,4 +43,9 @@ public class NotificationManager
     {
         queuedNotificationDao.delete(notification);
     }
+
+    public String getOrgId()
+    {
+        return orgId;
+    }
 }

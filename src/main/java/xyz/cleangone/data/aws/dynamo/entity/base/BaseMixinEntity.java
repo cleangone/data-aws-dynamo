@@ -1,6 +1,7 @@
 package xyz.cleangone.data.aws.dynamo.entity.base;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBIgnore;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 
 // experimenting with the concept of having optional fields
@@ -25,6 +26,11 @@ public class BaseMixinEntity extends BaseEntity
     {
         this();
         setName(name);
+    }
+
+    @DynamoDBIgnore public String getEnabledString()
+    {
+        return (enabled ? "Enabled" : "Disabled");
     }
 
     public String get(EntityField field)

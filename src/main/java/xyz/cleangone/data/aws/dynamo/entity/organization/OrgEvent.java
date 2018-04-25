@@ -4,6 +4,8 @@ import com.amazonaws.services.dynamodbv2.datamodeling.*;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityField;
 import xyz.cleangone.data.aws.dynamo.entity.image.ImageContainer;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static java.util.Objects.requireNonNull;
@@ -107,6 +109,14 @@ public class OrgEvent extends BaseOrg implements ImageContainer
     {
         if (ESTIMATED_ITERATIONS_FIELD.equals(field)) setEstimatedIterations(value);
         else super.setInt(field, value);
+    }
+
+    @DynamoDBIgnore
+    public List<String> getTagIds(OrgTag.TagType tagType)
+    {
+        if (tagType == OrgTag.TagType.PersonTag) { return getTagIds(); }
+        else if (tagType == OrgTag.TagType.Category) { return getCategoryIds(); }
+        else return Collections.emptyList();
     }
 
     @DynamoDBIgnore

@@ -2,12 +2,16 @@ package xyz.cleangone.data.aws.dynamo.entity.notification;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.*;
 import xyz.cleangone.data.aws.dynamo.entity.base.BaseEntity;
+import xyz.cleangone.data.aws.dynamo.entity.item.CatalogItem;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @DynamoDBTable(tableName = "QueuedNotification")
 public class QueuedNotification extends BaseEntity
 {
+    private static SimpleDateFormat SDF = new SimpleDateFormat("EEE MMM d, hh:mm:ss aaa");
+
     private String orgId;
     private NotificationType notificationType;
     private Date notificationDate;
@@ -15,14 +19,19 @@ public class QueuedNotification extends BaseEntity
 
     public QueuedNotification() { }
 
-    // QueuedNotification.id is the id of the entity the notification references
-    public QueuedNotification(
-        String entityId, String orgId, NotificationType notificationType, Date notificationDate)
+    // id is the id of the entity the notification references
+    public QueuedNotification(String entityId, String orgId, NotificationType notificationType, Date notificationDate)
     {
         setId(entityId);
         this.orgId = orgId;
         this.notificationType = notificationType;
         this.notificationDate = notificationDate;
+    }
+
+    public QueuedNotification(CatalogItem item, NotificationType notificationType)
+    {
+       this(item.getId(), item.getOrgId(), notificationType, item.getAvailabilityEnd());
+       itemId = item.getId();
     }
 
     @DynamoDBAttribute(attributeName = "OrgId")
@@ -63,6 +72,14 @@ public class QueuedNotification extends BaseEntity
     public void setItemId(String itemId)
     {
         this.itemId = itemId;
+    }
+
+    public String toFriendlyString()
+    {
+        return "Notification{id=" + id +
+            ", orgId=" + orgId +
+            ", notificationDate=" + SDF.format(notificationDate) +
+            ", notificationType=" + notificationType.toString() + "}";
     }
 }
 

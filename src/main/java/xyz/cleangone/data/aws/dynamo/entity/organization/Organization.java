@@ -15,6 +15,9 @@ public class Organization extends BaseOrg implements ImageContainer
     public static final EntityField LEFT_WIDTH_FIELD = new EntityField("org.leftColWidth", "Left Col. Width");
     public static final EntityField CENTER_WIDTH_FIELD = new EntityField("org.centerColWidth", "Center Col. Width");
     public static final EntityField RIGHT_WIDTH_FIELD = new EntityField("org.rightColWidth", "Right Col. Width");
+    public static final EntityField MAX_LEFT_WIDTH_FIELD = new EntityField("org.maxLeftColWidth", "Max Left Col. Width");
+    public static final EntityField MAX_CENTER_WIDTH_FIELD = new EntityField("org.maxCenterColWidth", "Max Center Col. Width");
+    public static final EntityField MAX_RIGHT_WIDTH_FIELD = new EntityField("org.maxRightColWidth", "Max Right Col. Width");
 
     public static final EntityField IATS_AGENT_CODE_FIELD = new EntityField("org.iaatsAgentCode", "iATS Agent Code");
     public static final EntityField IATS_PASSWORD_FIELD = new EntityField("org.iatsPassord", "iATS Password");
@@ -24,6 +27,9 @@ public class Organization extends BaseOrg implements ImageContainer
     private int leftColWidth;
     private int centerColWidth;
     private int rightColWidth;
+    private int maxLeftColWidth;
+    private int maxCenterColWidth;
+    private int maxRightColWidth;
 
     private PaymentProcessorType paymentProcessorType;
     private String paymentProcessorUser;
@@ -64,6 +70,9 @@ public class Organization extends BaseOrg implements ImageContainer
         if (LEFT_WIDTH_FIELD.equals(field)) return getLeftColWidth();
         else if (CENTER_WIDTH_FIELD.equals(field)) return getCenterColWidth();
         else if (RIGHT_WIDTH_FIELD.equals(field)) return getRightColWidth();
+        else if (MAX_LEFT_WIDTH_FIELD.equals(field)) return getMaxLeftColWidth();
+        else if (MAX_CENTER_WIDTH_FIELD.equals(field)) return getMaxCenterColWidth();
+        else if (MAX_RIGHT_WIDTH_FIELD.equals(field)) return getMaxRightColWidth();
         else return super.getInt(field);
     }
 
@@ -72,9 +81,11 @@ public class Organization extends BaseOrg implements ImageContainer
         if (LEFT_WIDTH_FIELD.equals(field)) setLeftColWidth(value);
         else if (CENTER_WIDTH_FIELD.equals(field)) setCenterColWidth(value);
         else if (RIGHT_WIDTH_FIELD.equals(field)) setRightColWidth(value);
+        else if (MAX_LEFT_WIDTH_FIELD.equals(field)) setMaxLeftColWidth(value);
+        else if (MAX_CENTER_WIDTH_FIELD.equals(field)) setMaxCenterColWidth(value);
+        else if (MAX_RIGHT_WIDTH_FIELD.equals(field)) setMaxRightColWidth(value);
         else super.setInt(field, value);
     }
-
 
     @DynamoDBIgnore
     public String getPaymentProcessorAuth()
@@ -133,6 +144,36 @@ public class Organization extends BaseOrg implements ImageContainer
     public void setRightColWidth(int rightColWidth)
     {
         this.rightColWidth = rightColWidth;
+    }
+
+    @DynamoDBAttribute(attributeName = "MaxLeftColWidth")
+    public int getMaxLeftColWidth()
+    {
+        return maxLeftColWidth;
+    }
+    public void setMaxLeftColWidth(int maxLeftColWidth)
+    {
+        this.maxLeftColWidth = maxLeftColWidth;
+    }
+
+    @DynamoDBAttribute(attributeName = "MaxCenterColWidth")
+    public int getMaxCenterColWidth()
+    {
+        return maxCenterColWidth;
+    }
+    public void setMaxCenterColWidth(int maxCenterColWidth)
+    {
+        this.maxCenterColWidth = maxCenterColWidth;
+    }
+
+    @DynamoDBAttribute(attributeName = "MaxRightColWidth")
+    public int getMaxRightColWidth()
+    {
+        return maxRightColWidth;
+    }
+    public void setMaxRightColWidth(int maxRightColWidth)
+    {
+        this.maxRightColWidth = maxRightColWidth;
     }
 
     @DynamoDBTyped(DynamoDBMapperFieldModel.DynamoDBAttributeType.S)

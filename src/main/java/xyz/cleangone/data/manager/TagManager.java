@@ -100,7 +100,7 @@ public class TagManager
     {
         if (event == null) { return new ArrayList<OrgTag>(); }
 
-        List<String> tagIds = event.getTagIds();
+        List<String> tagIds = event.getTagIds(tagType);
         return getTags(tagType).stream()
             .filter(t ->
                 event.getId().equals(t.getEventId()) ||
@@ -112,6 +112,13 @@ public class TagManager
     {
         return getTags(tagType).stream()
             .filter(t -> eventId.equals(t.getEventId()))
+            .collect(Collectors.toList());
+    }
+
+    public List<OrgTag> getEventTags(OrgTag.TagType tagType, String eventId, List<String> tagIds)
+    {
+        return getTags(tagType).stream()
+            .filter(t -> eventId.equals(t.getEventId()) || tagIds.contains(t.getId()))
             .collect(Collectors.toList());
     }
 

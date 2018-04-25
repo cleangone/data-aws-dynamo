@@ -5,6 +5,8 @@ import xyz.cleangone.data.aws.dynamo.dao.*;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityType;
 import xyz.cleangone.data.aws.dynamo.entity.image.ImageType;
 import xyz.cleangone.data.aws.dynamo.entity.item.CatalogItem;
+import xyz.cleangone.data.aws.dynamo.entity.notification.NotificationType;
+import xyz.cleangone.data.aws.dynamo.entity.notification.QueuedNotification;
 import xyz.cleangone.data.aws.dynamo.entity.organization.*;
 import xyz.cleangone.data.cache.EntityCache;
 import xyz.cleangone.data.manager.ImageContainerManager;
@@ -21,6 +23,7 @@ public class ItemManager implements ImageContainerManager
     private static final EntityCache<CatalogItem> ITEM_CACHE = new EntityCache<>(EntityType.Item);
 
     private final CatalogItemDao itemDao = new CatalogItemDao();
+    private final QueuedNotificationDao notificationDao = new QueuedNotificationDao();
 
     private Organization org;
     private OrgEvent event;
@@ -55,6 +58,10 @@ public class ItemManager implements ImageContainerManager
         return items;
     }
 
+    public CatalogItem getItemById(String itemId)
+    {
+        return itemDao.getById(itemId);
+    }
     public CatalogItem getItem()
     {
         return item;
@@ -98,12 +105,20 @@ public class ItemManager implements ImageContainerManager
 
     public void save()
     {
-        itemDao.save(item);
+        save(item);
     }
     public void save(CatalogItem item)
     {
         itemDao.save(item);
+
+        if (item.getEnabled() &&
+            item.isAvailable() &&
+            (item.isAuction() || item.isDrop() && item.isInDropWindow()))
+        {
+            notificationDao.save(new QueuedNotification(item, NotificationType.ItemAuctionClose));
+        }
     }
+
     public void delete(CatalogItem item)
     {
         itemDao.delete(item);
