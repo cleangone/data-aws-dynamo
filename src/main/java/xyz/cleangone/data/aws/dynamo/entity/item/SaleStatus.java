@@ -4,5 +4,6 @@ public enum SaleStatus
 {
     Preview,
     Available,
-    Sold;
+    Sold,
+    Unsold;
 }

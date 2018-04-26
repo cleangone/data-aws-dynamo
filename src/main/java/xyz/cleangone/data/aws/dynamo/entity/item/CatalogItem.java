@@ -15,13 +15,13 @@ import static java.util.Objects.requireNonNull;
 @DynamoDBTable(tableName="CatalogItem")
 public class CatalogItem extends PurchaseItem implements ImageContainer
 {
-    public static final EntityField CATEGORIES_FIELD = new EntityField("item.categories", "Categories");
-    public static final EntityField SALE_TYPE_FIELD = new EntityField("item.saleType", "Sale Type");
-    public static final EntityField SALE_STATUS_FIELD = new EntityField("item.saleStatus", "Status");
+    public static final EntityField CATEGORIES_FIELD      = new EntityField("item.categories", "Categories");
+    public static final EntityField SALE_TYPE_FIELD       = new EntityField("item.saleType", "Sale Type");
+    public static final EntityField SALE_STATUS_FIELD     = new EntityField("item.saleStatus", "Status");
     public static final EntityField COMBINED_STATUS_FIELD = new EntityField("item.combinedStatus", "Status");
-    public static final EntityField AVAIL_START_FIELD = new EntityField("item.availabilityStart", "Start Date");
-    public static final EntityField AVAIL_END_FIELD = new EntityField("item.availabilityEnd", "End Date");
-    public static final EntityField DROP_WINDOW_FIELD = new EntityField("item.dropWindow", "Drop Window (Min)");
+    public static final EntityField AVAIL_START_FIELD     = new EntityField("item.availabilityStart", "Start Date");
+    public static final EntityField AVAIL_END_FIELD       = new EntityField("item.availabilityEnd", "End Date");
+    public static final EntityField DROP_WINDOW_FIELD     = new EntityField("item.dropWindow", "Drop Window (Min)");
     public static long ONE_MINUTE = 1000*60;
 
     private String orgId;
@@ -29,6 +29,9 @@ public class CatalogItem extends PurchaseItem implements ImageContainer
     protected SaleStatus saleStatus = SaleStatus.Preview;
     protected Date availabilityStart;
     protected Date availabilityEnd;
+
+    protected Date auctionEnd;  // todo - should add this - an item can still be available after the auction ends
+
     private BigDecimal startPrice;
     private Integer dropWindow; // minutes, can be null
     private List<S3Link> images;
@@ -47,23 +50,26 @@ public class CatalogItem extends PurchaseItem implements ImageContainer
     @DynamoDBIgnore
     public void bid(ItemBid bid)
     {
+        // todo - should check that a bid not possibly past end date
         setPrice(bid.getCurrAmount());
         setHighBidId(bid.getId());
 
         Date now = new Date();
         if (availabilityEnd != null &&
-            availabilityEnd.getTime() > now.getTime() - ONE_MINUTE &&
-            availabilityEnd.getTime() < now.getTime())
+            now.getTime() > availabilityEnd.getTime() - ONE_MINUTE &&
+            now.getTime() < availabilityEnd.getTime())
         {
             setAvailabilityEnd(new Date(now.getTime() + ONE_MINUTE));
         }
     }
 
+    @DynamoDBIgnore public boolean hasBids()     { return highBidId != null; }
     @DynamoDBIgnore public boolean isPurchase()  { return saleType == SaleType.Purchase; }
     @DynamoDBIgnore public boolean isAuction()   { return saleType == SaleType.Auction; }
     @DynamoDBIgnore public boolean isDrop()      { return saleType == SaleType.Drop; }
     @DynamoDBIgnore public boolean isAvailable() { return saleStatus == SaleStatus.Available; }
     @DynamoDBIgnore public boolean isSold()      { return saleStatus == SaleStatus.Sold; }
+    @DynamoDBIgnore public boolean isUnsold()    { return saleStatus == SaleStatus.Unsold; }
 
     @DynamoDBIgnore public String getSaleTypeString() { return saleType.toString(); }
     @DynamoDBIgnore public String getSaleStatusString() { return saleStatus.toString(); }

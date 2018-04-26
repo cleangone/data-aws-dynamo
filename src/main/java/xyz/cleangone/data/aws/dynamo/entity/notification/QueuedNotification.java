@@ -7,6 +7,8 @@ import xyz.cleangone.data.aws.dynamo.entity.item.CatalogItem;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import static java.util.Objects.*;
+
 @DynamoDBTable(tableName = "QueuedNotification")
 public class QueuedNotification extends BaseEntity
 {
@@ -22,10 +24,10 @@ public class QueuedNotification extends BaseEntity
     // id is the id of the entity the notification references
     public QueuedNotification(String entityId, String orgId, NotificationType notificationType, Date notificationDate)
     {
-        setId(entityId);
-        this.orgId = orgId;
-        this.notificationType = notificationType;
-        this.notificationDate = notificationDate;
+        setId(requireNonNull(entityId));
+        this.orgId = requireNonNull(orgId);
+        this.notificationType = requireNonNull(notificationType);
+        this.notificationDate = requireNonNull(notificationDate);
     }
 
     public QueuedNotification(CatalogItem item, NotificationType notificationType)

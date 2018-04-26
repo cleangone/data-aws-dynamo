@@ -113,7 +113,9 @@ public class ItemManager implements ImageContainerManager
 
         if (item.getEnabled() &&
             item.isAvailable() &&
-            (item.isAuction() || item.isDrop() && item.isInDropWindow()))
+            (item.isAuction() || item.isDrop()) &&
+            item.getAvailabilityEnd() != null &&
+            item.getAvailabilityEnd().after(new Date()))
         {
             notificationDao.save(new QueuedNotification(item, NotificationType.ItemAuctionClose));
         }

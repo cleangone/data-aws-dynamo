@@ -7,6 +7,7 @@ import xyz.cleangone.data.aws.dynamo.entity.bid.BidUtils;
 import xyz.cleangone.data.aws.dynamo.entity.bid.ItemBid;
 import xyz.cleangone.data.aws.dynamo.entity.bid.UserBid;
 import xyz.cleangone.data.aws.dynamo.entity.item.CatalogItem;
+import xyz.cleangone.data.manager.event.ItemManager;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -19,7 +20,7 @@ public class BidProcessor
 {
     private final UserBidDao  userBidDao = new UserBidDao();
     private final ItemBidDao  itemBidDao = new ItemBidDao();
-    private final CatalogItemDao itemDao = new CatalogItemDao();
+    private final ItemManager itemMgr = new ItemManager();
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     // first bid on item
@@ -111,8 +112,9 @@ public class BidProcessor
         itemBidDao.save(itemBid);
         return itemBid;
     }
+
     private void save(CatalogItem item)
     {
-        itemDao.save(item);
+        itemMgr.save(item); // also handles QueuedNotification
     }
 }
