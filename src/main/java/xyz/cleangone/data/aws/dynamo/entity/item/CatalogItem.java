@@ -37,7 +37,7 @@ public class CatalogItem extends PurchaseItem implements ImageContainer
     private List<S3Link> images;
     private List<String> categoryIds;
     private String highBidId;
-
+    private String highBidderId;  // denormalized for speed
     private String categoriesCsv; // transient
 
     public CatalogItem() {}
@@ -53,6 +53,7 @@ public class CatalogItem extends PurchaseItem implements ImageContainer
         // todo - should check that a bid not possibly past end date
         setPrice(bid.getCurrAmount());
         setHighBidId(bid.getId());
+        setHighBidderId(bid.getUserId());  // replicated for speed
 
         Date now = new Date();
         if (availabilityEnd != null &&
@@ -63,10 +64,19 @@ public class CatalogItem extends PurchaseItem implements ImageContainer
         }
     }
 
+    @DynamoDBIgnore
+    public boolean isVisible()
+    {
+        return (enabled &&
+            !isPreview() &&
+            (availabilityStart == null || availabilityStart.before(new Date())));
+    }
+
     @DynamoDBIgnore public boolean hasBids()     { return highBidId != null; }
     @DynamoDBIgnore public boolean isPurchase()  { return saleType == SaleType.Purchase; }
     @DynamoDBIgnore public boolean isAuction()   { return saleType == SaleType.Auction; }
     @DynamoDBIgnore public boolean isDrop()      { return saleType == SaleType.Drop; }
+    @DynamoDBIgnore public boolean isPreview()   { return saleStatus == SaleStatus.Preview; }
     @DynamoDBIgnore public boolean isAvailable() { return saleStatus == SaleStatus.Available; }
     @DynamoDBIgnore public boolean isSold()      { return saleStatus == SaleStatus.Sold; }
     @DynamoDBIgnore public boolean isUnsold()    { return saleStatus == SaleStatus.Unsold; }
@@ -224,6 +234,16 @@ public class CatalogItem extends PurchaseItem implements ImageContainer
     public void setHighBidId(String highBidId)
     {
         this.highBidId = highBidId;
+    }
+
+    @DynamoDBAttribute(attributeName="HighBidderId")
+    public String getHighBidderId()
+    {
+        return highBidderId;
+    }
+    public void setHighBidderId(String highBidderId)
+    {
+        this.highBidderId = highBidderId;
     }
 
     @DynamoDBIgnore

@@ -25,6 +25,8 @@ public class User extends BaseMixinEntity
     public static final EntityField ZIP_FIELD = new EntityField("user.zip", "Zip");
     public static final EntityField PHONE_FIELD = new EntityField("user.phone", "Phone");
     public static final EntityField ACCEPT_TEXTS_FIELD = new EntityField("user.acceptText", "Accept Texts");
+    public static final EntityField SHOW_BID_CONFIRM_FIELD = new EntityField("user.showBidConfirm", "Require Bid Confirmation");
+    public static final EntityField SHOW_QUICK_BID_FIELD = new EntityField("user.showQuickBid", "Show QuickBid Button");
     public static final EntityField LAST_FIRST_FIELD = new EntityField("user.lastfirst", "Last, First");
     public static final EntityField ORG_ADMIN_FIELD = new EntityField("user.transient.orgadmin", "Admin Privledge");
     public static final EntityField TAGS_FIELD = new EntityField("user.tags", "Roles");
@@ -40,6 +42,8 @@ public class User extends BaseMixinEntity
     private String zip;
     private String phone;
     private boolean acceptTexts;
+    private boolean showBidConfirm;
+    private boolean showQuickBid;
     private List<UserPrivledge> userPrivledges;
     private List<String> tagIds;
     private String tagsCsv; // transient
@@ -110,12 +114,16 @@ public class User extends BaseMixinEntity
     public boolean getBoolean(EntityField field)
     {
         if (ACCEPT_TEXTS_FIELD.equals(field)) return getAcceptTexts();
+        else if (SHOW_BID_CONFIRM_FIELD.equals(field)) return getShowBidConfirm();
+        else if (SHOW_QUICK_BID_FIELD.equals(field)) return getShowQuickBid();
         else return super.getBoolean(field);
     }
 
     public void setBoolean(EntityField field, boolean value)
     {
         if (ACCEPT_TEXTS_FIELD.equals(field)) setAcceptTexts(value);
+        else if (SHOW_BID_CONFIRM_FIELD.equals(field)) setShowBidConfirm(value);
+        else if (SHOW_QUICK_BID_FIELD.equals(field)) setShowQuickBid(value);
         else super.setBoolean(field, value);
     }
 
@@ -221,6 +229,26 @@ public class User extends BaseMixinEntity
     public void setAcceptTexts(boolean acceptTexts)
     {
         this.acceptTexts = acceptTexts;
+    }
+
+    @DynamoDBAttribute(attributeName="ShowBidConfirm")
+    public boolean getShowBidConfirm()
+    {
+        return showBidConfirm;
+    }
+    public void setShowBidConfirm(boolean showBidConfirm)
+    {
+        this.showBidConfirm = showBidConfirm;
+    }
+
+    @DynamoDBAttribute(attributeName="ShowQuickBid")
+    public boolean getShowQuickBid()
+    {
+        return showQuickBid;
+    }
+    public void setShowQuickBid(boolean showQuickBid)
+    {
+        this.showQuickBid = showQuickBid;
     }
 
     @DynamoDBAttribute(attributeName = "UserPrivledges")

@@ -97,7 +97,6 @@ public class BidProcessor
     {
         ItemBid bid = save(new ItemBid(userBid, userBid.getCurrAmount(), true));
 
-        //CatalogItem item = itemDao.getById(bid.getItemId());
         item.bid(bid);
         save(item);
     }
