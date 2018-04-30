@@ -69,7 +69,7 @@ public class ImageManager
             .collect(Collectors.toList());
     }
 
-    public String getUrl(S3Link image)
+    public static String getUrl(S3Link image)
     {
         return AwsClientFactory.getPublicUrl(image);
     }

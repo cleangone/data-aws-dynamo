@@ -14,6 +14,7 @@ import xyz.cleangone.data.aws.dynamo.entity.person.Person;
 import xyz.cleangone.data.aws.dynamo.entity.person.User;
 import xyz.cleangone.data.cache.EntityCache;
 import xyz.cleangone.data.manager.event.BidManager;
+import xyz.cleangone.data.manager.event.ItemManager;
 
 import java.util.Date;
 import java.util.List;
@@ -191,6 +192,10 @@ public class OrgManager implements ImageContainerManager
         else if (imageType == ImageType.Blurb) { getOrg().setBlurbBannerUrl(imageUrl); }
     }
 
+    public ItemManager getItemManager()
+    {
+        return new ItemManager(org);
+    }
     public ActionManager getActionManager()
     {
         return new ActionManager(org);

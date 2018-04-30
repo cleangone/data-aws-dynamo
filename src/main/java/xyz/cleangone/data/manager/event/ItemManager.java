@@ -35,6 +35,10 @@ public class ItemManager implements ImageContainerManager
     {
         this(that.org, that.event, item);
     }
+    public ItemManager(Organization org)
+    {
+        this.org = org;
+    }
     public ItemManager(Organization org, OrgEvent event, CatalogItem item)
     {
         this.org = org;
@@ -88,6 +92,13 @@ public class ItemManager implements ImageContainerManager
     {
         return getItems().stream()
             .filter(item -> item.getCategoryIds().contains(categoryId))
+            .collect(Collectors.toList());
+    }
+
+    public List<CatalogItem> getItems(List<String> itemIds)
+    {
+        return getOrgItems().stream()
+            .filter(item -> itemIds.contains(item.getId()))
             .collect(Collectors.toList());
     }
 
