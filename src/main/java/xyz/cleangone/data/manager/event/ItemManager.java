@@ -11,6 +11,7 @@ import xyz.cleangone.data.aws.dynamo.entity.organization.*;
 import xyz.cleangone.data.cache.EntityCache;
 import xyz.cleangone.data.manager.ImageContainerManager;
 import xyz.cleangone.data.manager.ImageManager;
+import xyz.cleangone.data.manager.TagManager;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -30,6 +31,10 @@ public class ItemManager implements ImageContainerManager
     private CatalogItem item;
 
     public ItemManager() { }
+    public ItemManager(ItemManager that, CatalogItem item)
+    {
+        this(that.org, that.event, item);
+    }
     public ItemManager(Organization org, OrgEvent event, CatalogItem item)
     {
         this.org = org;
@@ -37,12 +42,13 @@ public class ItemManager implements ImageContainerManager
         this.item = item;
     }
 
-    public void createItem(String name, String categoryId)
+    public CatalogItem createItem(String name, String categoryId)
     {
         CatalogItem item = new CatalogItem(name, org.getId(), event.getId());
         if (categoryId != null) { item.addCategoryId(categoryId); }
 
         itemDao.save(item);
+        return item;
     }
 
     private List<CatalogItem> getOrgItems()
@@ -160,6 +166,11 @@ public class ItemManager implements ImageContainerManager
         return null;
     }
     public void setImageUrl(ImageType imageType, String imageUrl) { }
+
+    public TagManager getTagManager()
+    {
+        return new TagManager(org);
+    }
 
     public CatalogItemDao getDao()
     {

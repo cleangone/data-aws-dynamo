@@ -26,6 +26,12 @@ public class TagManager
         tagDao = new TagDao();
     }
 
+    public TagManager(Organization org)
+    {
+        this.org = org;
+        tagDao = new TagDao();
+    }
+
     // no external entity should want all the diff tag types mixed together
     private List<OrgTag> getTags()
     {

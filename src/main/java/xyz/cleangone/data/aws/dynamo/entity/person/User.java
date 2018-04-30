@@ -46,6 +46,7 @@ public class User extends BaseMixinEntity
     private boolean showQuickBid;
     private List<UserPrivledge> userPrivledges;
     private List<String> tagIds;
+    private List<String> watchedItemIds;
     private String tagsCsv; // transient
     private Person person; // transient
 
@@ -69,10 +70,13 @@ public class User extends BaseMixinEntity
         return false;
     }
 
-    @DynamoDBIgnore
-    public boolean hasPrivledge(String orgId)
+    @DynamoDBIgnore public boolean hasPrivledge(String orgId)
     {
         return (this.orgId == null || this.orgId.equals(orgId));
+    }
+    @DynamoDBIgnore public boolean isWatching(String itemId)
+    {
+        return getWatchedItemIds().contains(itemId);
     }
 
     @DynamoDBIgnore
@@ -290,6 +294,24 @@ public class User extends BaseMixinEntity
         tagIds.remove(tagId);
     }
 
+    @DynamoDBAttribute(attributeName="WatchedItemIds")
+    public List<String> getWatchedItemIds()
+    {
+        if (watchedItemIds == null) { watchedItemIds = new ArrayList<>(); }
+        return watchedItemIds;
+    }
+    public void setWatchedItemIds(List<String> watchedItemIds)
+    {
+        this.watchedItemIds = watchedItemIds;
+    }
+    public void addWatchedItemId(String itemId)
+    {
+        if (!getWatchedItemIds().contains(itemId)) { watchedItemIds.add(itemId); }
+    }
+    public void removeWatchedItemId(String itemId)
+    {
+        watchedItemIds.remove(itemId);
+    }
 
     @DynamoDBIgnore
     public String getTagsCsv() { return tagsCsv; }
