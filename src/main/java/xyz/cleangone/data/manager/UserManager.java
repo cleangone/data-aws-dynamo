@@ -2,12 +2,13 @@ package xyz.cleangone.data.manager;
 
 import static java.util.Objects.requireNonNull;
 
+import xyz.cleangone.data.aws.dynamo.dao.AddressDao;
 import xyz.cleangone.data.aws.dynamo.dao.UserDao;
 import xyz.cleangone.data.aws.dynamo.dao.PersonDao;
 import xyz.cleangone.data.aws.dynamo.dao.UserTokenDao;
-import xyz.cleangone.data.aws.dynamo.entity.organization.EventParticipant;
 import xyz.cleangone.data.aws.dynamo.entity.organization.OrgTag;
 import xyz.cleangone.data.aws.dynamo.entity.organization.Organization;
+import xyz.cleangone.data.aws.dynamo.entity.person.Address;
 import xyz.cleangone.data.aws.dynamo.entity.person.Person;
 import xyz.cleangone.data.aws.dynamo.entity.person.User;
 import xyz.cleangone.data.aws.dynamo.entity.person.UserToken;
@@ -19,6 +20,7 @@ public class UserManager
 {
     private UserDao userDao = new UserDao();
     private PersonDao personDao = new PersonDao();
+    private AddressDao addressDao = new AddressDao();
     private UserTokenDao userTokenDao = new UserTokenDao();
 
     private User user;
@@ -213,10 +215,7 @@ public class UserManager
         User copiedUser = new User();
         copiedUser.setPersonId(user.getPersonId());
         copiedUser.setEmail(user.getEmail());
-        copiedUser.setAddress(user.getAddress());
-        copiedUser.setCity(user.getCity());
-        copiedUser.setState(user.getState());
-        copiedUser.setZip(user.getZip());
+        copiedUser.setAddressId(user.getAddressId());
 
         Person copiedPerson = new Person();
         copiedUser.setPerson(copiedPerson);
@@ -227,16 +226,45 @@ public class UserManager
         return copiedUser;
     }
 
-    public UserDao getUserDao()
+
+    //
+    // Address
+    //
+    public Address getAddress()
     {
-        return userDao;
-    }
-    public PersonDao getPersonDao()
-    {
-        return personDao;
+        return (user == null || user.getAddressId() == null ? null : addressDao.getById(user.getAddressId()));
     }
 
+    public Address createAddress()
+    {
+        Address address = new Address();
+        addressDao.save(address);
 
+        user.setAddressId(address.getId());
+        userDao.save(user);
+
+        return address;
+    }
+
+    public Address copyAddress()
+    {
+        Address copiedAddress = new Address();
+
+        Address address = getAddress();
+        if (address != null)
+        {
+            copiedAddress.setStreetAddress(address.getStreetAddress());
+            copiedAddress.setCity(address.getCity());
+            copiedAddress.setState(address.getState());
+            copiedAddress.setZip(address.getZip());
+        }
+
+        return copiedAddress;
+    }
+
+    //
+    // Email
+    //
     public void verifyEmail(String verifyEmailTokenId)
     {
         if (verifyEmailTokenId == null) { return; }
@@ -308,4 +336,16 @@ public class UserManager
         }
     }
 
+    public UserDao getUserDao()
+    {
+        return userDao;
+    }
+    public PersonDao getPersonDao()
+    {
+        return personDao;
+    }
+    public AddressDao getAddressDao()
+    {
+        return addressDao;
+    }
 }

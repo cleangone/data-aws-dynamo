@@ -4,7 +4,7 @@ import xyz.cleangone.data.aws.dynamo.entity.base.BaseEntity;
 import xyz.cleangone.data.aws.dynamo.entity.base.BaseMixinEntity;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityLastTouched;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityType;
-import xyz.cleangone.data.aws.dynamo.dao.OrgDao;
+import xyz.cleangone.data.aws.dynamo.dao.org.OrgDao;
 import xyz.cleangone.data.aws.dynamo.entity.organization.Organization;
 
 import java.util.*;

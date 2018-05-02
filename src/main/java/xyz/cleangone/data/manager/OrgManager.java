@@ -3,13 +3,16 @@ package xyz.cleangone.data.manager;
 import static java.util.Objects.*;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.S3Link;
-import xyz.cleangone.data.aws.dynamo.dao.OrgDao;
+import xyz.cleangone.data.aws.dynamo.dao.org.OrgDao;
 import xyz.cleangone.data.aws.dynamo.dao.PersonDao;
 import xyz.cleangone.data.aws.dynamo.dao.UserDao;
+import xyz.cleangone.data.aws.dynamo.dao.org.PaymentProcessorDao;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityLastTouched;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityType;
 import xyz.cleangone.data.aws.dynamo.entity.image.ImageType;
 import xyz.cleangone.data.aws.dynamo.entity.organization.Organization;
+import xyz.cleangone.data.aws.dynamo.entity.organization.PaymentProcessor;
+import xyz.cleangone.data.aws.dynamo.entity.person.Address;
 import xyz.cleangone.data.aws.dynamo.entity.person.Person;
 import xyz.cleangone.data.aws.dynamo.entity.person.User;
 import xyz.cleangone.data.cache.EntityCache;
@@ -29,8 +32,10 @@ public class OrgManager implements ImageContainerManager
     private OrgDao orgDao;
     private PersonDao personDao;
     private UserDao userDao;
+    private PaymentProcessorDao paymentProcessorDao = new PaymentProcessorDao();
 
     protected Organization org;
+    protected PaymentProcessor paymentProcessor;
     private TagManager tagManager;
 
     public OrgManager()
@@ -133,12 +138,15 @@ public class OrgManager implements ImageContainerManager
     public void setOrg(Organization org)
     {
         this.org = org;
+        paymentProcessor = null;
     }
 
     public Organization setOrgById(String orgId)
     {
         org = orgDao.getById(requireNonNull(orgId));
 //        event = null;
+        paymentProcessor = null;
+
         return org;
     }
 
@@ -156,6 +164,34 @@ public class OrgManager implements ImageContainerManager
         return requireNonNull(org).getId();
     }
 
+
+
+
+    public PaymentProcessor getPaymentProcessor()
+    {
+        if (paymentProcessor == null)
+        {
+            paymentProcessor = (org == null || org.getPaymentProcessorId() == null) ? null : paymentProcessorDao.getById(org.getPaymentProcessorId());
+        }
+
+        return paymentProcessor;
+    }
+
+    public PaymentProcessor createPaymentProcessor()
+    {
+        paymentProcessor = new PaymentProcessor();
+        paymentProcessorDao.save(paymentProcessor);
+
+        org.setPaymentProcessorId(paymentProcessor.getId());
+        orgDao.save(org);
+
+        return paymentProcessor;
+    }
+
+
+    //
+    // Images
+    //
     public List<S3Link> getImages()
     {
         return getOrg().getImages();
@@ -223,5 +259,9 @@ public class OrgManager implements ImageContainerManager
     public OrgDao getOrgDao()
     {
         return orgDao;
+    }
+    public PaymentProcessorDao getPaymentProcessorDao()
+    {
+        return paymentProcessorDao;
     }
 }

@@ -11,9 +11,9 @@ import java.util.stream.Collectors;
 @DynamoDBTable(tableName="Person")
 public class Person extends BaseEntity
 {
-    public static final EntityField FIRST_NAME_FIELD = new EntityField("person.firstName", "First Name");
-    public static final EntityField LAST_NAME_FIELD = new EntityField("person.lastName", "Last Name");
-    public static final EntityField TAGS_FIELD = new EntityField("person.tags", "Tags");
+    public static final EntityField FIRST_NAME_FIELD = new EntityField("Person.firstName", "First Name");
+    public static final EntityField LAST_NAME_FIELD = new EntityField("Person.lastName", "Last Name");
+    public static final EntityField TAGS_FIELD = new EntityField("Person.tags", "Tags");
 
     private String orgId;
     private String firstName;

@@ -3,24 +3,16 @@ package xyz.cleangone.data.aws.dynamo.entity.organization;
 import com.amazonaws.services.dynamodbv2.datamodeling.*;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityField;
 import xyz.cleangone.data.aws.dynamo.entity.image.ImageContainer;
-import xyz.cleangone.util.Crypto;
-
-import java.util.Objects;
 
 @DynamoDBTable(tableName="Organization")
 public class Organization extends BaseOrg implements ImageContainer
 {
-    public enum PaymentProcessorType { iATS, None }
-
     public static final EntityField LEFT_WIDTH_FIELD = new EntityField("org.leftColWidth", "Left Col. Width");
     public static final EntityField CENTER_WIDTH_FIELD = new EntityField("org.centerColWidth", "Center Col. Width");
     public static final EntityField RIGHT_WIDTH_FIELD = new EntityField("org.rightColWidth", "Right Col. Width");
     public static final EntityField MAX_LEFT_WIDTH_FIELD = new EntityField("org.maxLeftColWidth", "Max Left Col. Width");
     public static final EntityField MAX_CENTER_WIDTH_FIELD = new EntityField("org.maxCenterColWidth", "Max Center Col. Width");
     public static final EntityField MAX_RIGHT_WIDTH_FIELD = new EntityField("org.maxRightColWidth", "Max Right Col. Width");
-
-    public static final EntityField IATS_AGENT_CODE_FIELD = new EntityField("org.iaatsAgentCode", "iATS Agent Code");
-    public static final EntityField IATS_PASSWORD_FIELD = new EntityField("org.iatsPassord", "iATS Password");
     public static final EntityField EVENT_CAPTION_FIELD = new EntityField("org.eventCaption", "Event Caption");
     public static final EntityField EVENT_CAPTION_PLURAL_FIELD = new EntityField("org.eventCaptionPlural", "Event Caption Plural");
 
@@ -31,10 +23,8 @@ public class Organization extends BaseOrg implements ImageContainer
     private int maxCenterColWidth;
     private int maxRightColWidth;
 
-    private PaymentProcessorType paymentProcessorType;
-    private String paymentProcessorUser;
-    private String encryptedPaymentProcessorAuth;
-    private String eventCaption;
+    private String paymentProcessorId;
+    private String eventCaption;   // display name for Events - for when they are used to manage some other type of thing
     private String eventCaptionPlural;
 
     public Organization()
@@ -49,18 +39,14 @@ public class Organization extends BaseOrg implements ImageContainer
 
     public String get(EntityField field)
     {
-        if (IATS_AGENT_CODE_FIELD.equals(field)) return getPaymentProcessorUser();
-        else if (IATS_PASSWORD_FIELD.equals(field)) return getPaymentProcessorAuth();  // todo - do we want this available?
-        else if (EVENT_CAPTION_FIELD.equals(field)) return getEventCaption();
+        if (EVENT_CAPTION_FIELD.equals(field)) return getEventCaption();
         else if (EVENT_CAPTION_PLURAL_FIELD.equals(field)) return getEventCaptionPlural();
         else return super.get(field);
     }
 
     public void set(EntityField field, String value)
     {
-        if (IATS_AGENT_CODE_FIELD.equals(field)) setPaymentProcessorUser(value);
-        else if (IATS_PASSWORD_FIELD.equals(field)) setPaymentProcessorAuth(value);
-        else if (EVENT_CAPTION_FIELD.equals(field)) setEventCaption(value);
+        if (EVENT_CAPTION_FIELD.equals(field)) setEventCaption(value);
         else if (EVENT_CAPTION_PLURAL_FIELD.equals(field)) setEventCaptionPlural(value);
         else super.set(field, value);
     }
@@ -85,29 +71,6 @@ public class Organization extends BaseOrg implements ImageContainer
         else if (MAX_CENTER_WIDTH_FIELD.equals(field)) setMaxCenterColWidth(value);
         else if (MAX_RIGHT_WIDTH_FIELD.equals(field)) setMaxRightColWidth(value);
         else super.setInt(field, value);
-    }
-
-    @DynamoDBIgnore
-    public String getPaymentProcessorAuth()
-    {
-        return getEncryptedPaymentProcessorAuth() == null ? null : Crypto.decrypt(getEncryptedPaymentProcessorAuth());
-    }
-
-    @DynamoDBIgnore
-    public void setPaymentProcessorAuth(String processorAuth)
-    {
-        setEncryptedPaymentProcessorAuth(encrypt(processorAuth));
-    }
-
-    private String encrypt(String s)
-    {
-        return Crypto.encrypt(Objects.requireNonNull(s));
-    }
-
-    @DynamoDBIgnore
-    public boolean isPaymentProcessor(PaymentProcessorType type)
-    {
-        return paymentProcessorType == type;
     }
 
     @DynamoDBIgnore
@@ -176,34 +139,14 @@ public class Organization extends BaseOrg implements ImageContainer
         this.maxRightColWidth = maxRightColWidth;
     }
 
-    @DynamoDBTyped(DynamoDBMapperFieldModel.DynamoDBAttributeType.S)
-    public PaymentProcessorType getPaymentProcessorType()
+    @DynamoDBAttribute(attributeName = "PaymentProcessorId")
+    public String getPaymentProcessorId()
     {
-        return paymentProcessorType;
+        return paymentProcessorId;
     }
-    public void setPaymentProcessorType(PaymentProcessorType paymentProcessorType)
+    public void setPaymentProcessorId(String paymentProcessorId)
     {
-        this.paymentProcessorType = paymentProcessorType;
-    }
-
-    @DynamoDBAttribute(attributeName = "PaymentProcessorUser")
-    public String getPaymentProcessorUser()
-    {
-        return paymentProcessorUser;
-    }
-    public void setPaymentProcessorUser(String paymentProcessorUser)
-    {
-        this.paymentProcessorUser = paymentProcessorUser;
-    }
-
-    @DynamoDBAttribute(attributeName = "EncryptedPaymentProcessorAuth")
-    public String getEncryptedPaymentProcessorAuth()
-    {
-        return encryptedPaymentProcessorAuth;
-    }
-    public void setEncryptedPaymentProcessorAuth(String encryptedPaymentProcessorAuth)
-    {
-        this.encryptedPaymentProcessorAuth = encryptedPaymentProcessorAuth;
+        this.paymentProcessorId = paymentProcessorId;
     }
 
     @DynamoDBAttribute(attributeName = "EventCaption")

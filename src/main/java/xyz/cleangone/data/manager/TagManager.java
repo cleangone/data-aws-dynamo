@@ -1,6 +1,6 @@
 package xyz.cleangone.data.manager;
 
-import xyz.cleangone.data.aws.dynamo.dao.TagDao;
+import xyz.cleangone.data.aws.dynamo.dao.org.TagDao;
 import xyz.cleangone.data.aws.dynamo.entity.base.BaseEntity;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityType;
 import xyz.cleangone.data.aws.dynamo.entity.organization.OrgEvent;

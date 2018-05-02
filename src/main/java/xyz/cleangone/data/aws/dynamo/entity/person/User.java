@@ -19,10 +19,6 @@ public class User extends BaseMixinEntity
 {
     public static final EntityField PASSWORD_FIELD = new EntityField("user.password", "Password");
     public static final EntityField EMAIL_FIELD = new EntityField("user.email", "Email");
-    public static final EntityField ADDRESS_FIELD = new EntityField("user.address", "Address");
-    public static final EntityField CITY_FIELD = new EntityField("user.city", "City");
-    public static final EntityField STATE_FIELD = new EntityField("user.state", "State");
-    public static final EntityField ZIP_FIELD = new EntityField("user.zip", "Zip");
     public static final EntityField PHONE_FIELD = new EntityField("user.phone", "Phone");
     public static final EntityField ACCEPT_TEXTS_FIELD = new EntityField("user.acceptText", "Accept Texts");
     public static final EntityField SHOW_BID_CONFIRM_FIELD = new EntityField("user.showBidConfirm", "Require Bid Confirmation");
@@ -31,25 +27,24 @@ public class User extends BaseMixinEntity
     public static final EntityField ORG_ADMIN_FIELD = new EntityField("user.transient.orgadmin", "Admin Privledge");
     public static final EntityField TAGS_FIELD = new EntityField("user.tags", "Roles");
 
+    private List<String> watchedItemIds;  // todo - would have to be moved out of core user
+    private boolean showBidConfirm;
+    private boolean showQuickBid;
+
     private String orgId;  // null for super
     private String personId;
     private String encryptedPassword;
     private String email;
     private boolean emailVerified;
-    private String address;
-    private String city;
-    private String state;
-    private String zip;
-    private String phone;
+    private String addressId;
+
+    private String phone;  // todo - multiple phones, with type and acceptTexts
     private boolean acceptTexts;
-    private boolean showBidConfirm;
-    private boolean showQuickBid;
+
     private List<UserPrivledge> userPrivledges;
     private List<String> tagIds;
-    private List<String> watchedItemIds;
     private String tagsCsv; // transient
     private Person person; // transient
-
 
     @DynamoDBIgnore
     public boolean isSuper()
@@ -96,10 +91,6 @@ public class User extends BaseMixinEntity
     public String get(EntityField field)
     {
         if (EMAIL_FIELD.equals(field)) return getEmail();
-        else if (ADDRESS_FIELD.equals(field)) return getAddress();
-        else if (CITY_FIELD.equals(field)) return getCity();
-        else if (STATE_FIELD.equals(field)) return getState();
-        else if (ZIP_FIELD.equals(field)) return getZip();
         else if (PHONE_FIELD.equals(field)) return getPhone();
         else return super.get(field);
     }
@@ -107,10 +98,6 @@ public class User extends BaseMixinEntity
     public void set(EntityField field, String value)
     {
         if (EMAIL_FIELD.equals(field)) setEmail(value);
-        else if (ADDRESS_FIELD.equals(field)) setAddress(value);
-        else if (CITY_FIELD.equals(field)) setCity(value);
-        else if (STATE_FIELD.equals(field)) setState(value);
-        else if (ZIP_FIELD.equals(field)) setZip(value);
         else if (PHONE_FIELD.equals(field)) setPhone(value);
         else super.set(field, value);
     }
@@ -175,44 +162,14 @@ public class User extends BaseMixinEntity
         this.emailVerified = emailVerified;
     }
 
-    @DynamoDBAttribute(attributeName="Address")
-    public String getAddress()
+    @DynamoDBAttribute(attributeName="AddressId")
+    public String getAddressId()
     {
-        return address;
+        return addressId;
     }
-    public void setAddress(String address)
+    public void setAddressId(String addressId)
     {
-        this.address = address;
-    }
-
-    @DynamoDBAttribute(attributeName="City")
-    public String getCity()
-    {
-        return city;
-    }
-    public void setCity(String city)
-    {
-        this.city = city;
-    }
-
-    @DynamoDBAttribute(attributeName="State")
-    public String getState()
-    {
-        return state;
-    }
-    public void setState(String state)
-    {
-        this.state = state;
-    }
-
-    @DynamoDBAttribute(attributeName="Zip")
-    public String getZip()
-    {
-        return zip;
-    }
-    public void setZip(String zip)
-    {
-        this.zip = zip;
+        this.addressId = addressId;
     }
 
     @DynamoDBAttribute(attributeName="Phone")

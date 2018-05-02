@@ -22,6 +22,7 @@ public class CatalogItem extends PurchaseItem implements ImageContainer
     public static final EntityField AVAIL_START_FIELD     = new EntityField("item.availabilityStart", "Start Date");
     public static final EntityField AVAIL_END_FIELD       = new EntityField("item.availabilityEnd", "End Date");
     public static final EntityField DROP_WINDOW_FIELD     = new EntityField("item.dropWindow", "Drop Window (Min)");
+    public static final EntityField RELATIVE_WIDTH_FIELD  = new EntityField("item.relativeWidth", "Relative Width");
     public static long ONE_MINUTE = 1000*60;
 
     private String orgId;
@@ -34,6 +35,7 @@ public class CatalogItem extends PurchaseItem implements ImageContainer
 
     private BigDecimal startPrice;
     private Integer dropWindow; // minutes, can be null
+    private Integer relativeWidth; // 2 = 2x normal, etc, null is default
     private List<S3Link> images;
     private List<String> categoryIds;
     private String highBidId;
@@ -102,12 +104,14 @@ public class CatalogItem extends PurchaseItem implements ImageContainer
     public Integer getInteger(EntityField field)
     {
         if (DROP_WINDOW_FIELD.equals(field)) return getDropWindow();
+        if (RELATIVE_WIDTH_FIELD.equals(field)) return getRelativeWidth();
         else return super.getInteger(field);
     }
 
     public void setInteger(EntityField field, Integer value)
     {
         if (DROP_WINDOW_FIELD.equals(field)) setDropWindow(value);
+        if (RELATIVE_WIDTH_FIELD.equals(field)) setRelativeWidth(value);
         else super.setInteger(field, value);
     }
 
@@ -185,6 +189,16 @@ public class CatalogItem extends PurchaseItem implements ImageContainer
     public void setDropWindow(Integer dropWindow)
     {
         this.dropWindow = dropWindow;
+    }
+
+    @DynamoDBAttribute(attributeName = "RelativeWidth")
+    public Integer getRelativeWidth()
+    {
+        return relativeWidth;
+    }
+    public void setRelativeWidth(Integer relativeWidth)
+    {
+        this.relativeWidth = relativeWidth;
     }
 
     @DynamoDBAttribute(attributeName="Images")

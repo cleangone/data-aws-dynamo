@@ -1,6 +1,7 @@
-package xyz.cleangone.data.aws.dynamo.dao;
+package xyz.cleangone.data.aws.dynamo.dao.org;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
+import xyz.cleangone.data.aws.dynamo.dao.DynamoBaseDao;
 import xyz.cleangone.data.aws.dynamo.entity.organization.Organization;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityType;
 
@@ -45,6 +46,3 @@ public class OrgDao extends DynamoBaseDao<Organization>
         setEntityLastTouched(org.getId(), EntityType.Entity);
     }
 }
-
-
-
