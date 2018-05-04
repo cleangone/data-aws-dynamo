@@ -1,6 +1,7 @@
 package xyz.cleangone.data.manager;
 
 import xyz.cleangone.data.aws.dynamo.dao.ActionDao;
+import xyz.cleangone.data.aws.dynamo.dao.EventDao;
 import xyz.cleangone.data.aws.dynamo.entity.action.Action;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityType;
 import xyz.cleangone.data.aws.dynamo.entity.bid.UserBid;
@@ -27,6 +28,7 @@ public class ActionManager
     public static final EntityCache<Action> ACTION_CACHE_BY_PERSON = new EntityCache<>(EntityType.Action, 50);
 
     private final ActionDao actionDao = new ActionDao();
+    private final EventDao eventDao = new EventDao();
     private final Organization org;
 
     public ActionManager(Organization org)
@@ -88,6 +90,11 @@ public class ActionManager
         if (item.isDonation()) { return createDonation(user, item); }
         else if (item.isPledgeFulfillment()) { return createPledgeFulfillment(user, item); }
         else return createPurchase(user, item);
+    }
+
+    public Action createBid(User user, UserBid userBid, PurchaseItem item)
+    {
+        return createBid(user, userBid, item, eventDao.getById(item.getEventId())); // bit of a hack to hit db directly
     }
 
     public Action createBid(User user, UserBid userBid, PurchaseItem item, OrgEvent event)

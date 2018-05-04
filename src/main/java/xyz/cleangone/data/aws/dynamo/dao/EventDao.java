@@ -7,6 +7,11 @@ import java.util.List;
 
 public class EventDao extends DynamoBaseDao<OrgEvent>
 {
+    public OrgEvent getById(String id)
+    {
+        return mapper.load(OrgEvent.class, id);
+    }
+
     public List<OrgEvent> getByOrg(String orgId)
     {
         return mapper.scan(OrgEvent.class, byOrgId(orgId));

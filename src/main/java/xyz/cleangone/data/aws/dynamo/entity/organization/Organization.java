@@ -24,6 +24,8 @@ public class Organization extends BaseOrg implements ImageContainer
     private int maxRightColWidth;
 
     private String paymentProcessorId;
+
+    // todo - Plural obj - can dynamo store pojo inline? would also used by event.iterationLabel
     private String eventCaption;   // display name for Events - for when they are used to manage some other type of thing
     private String eventCaptionPlural;
 
