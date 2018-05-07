@@ -1,5 +1,6 @@
-package xyz.cleangone.data.aws.dynamo.dao;
+package xyz.cleangone.data.aws.dynamo.dao.event;
 
+import xyz.cleangone.data.aws.dynamo.dao.DynamoBaseDao;
 import xyz.cleangone.data.aws.dynamo.entity.organization.OrgEvent;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityType;
 

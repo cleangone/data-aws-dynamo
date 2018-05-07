@@ -17,7 +17,7 @@ public class EventParticipant extends BaseMixinEntity
     public static final EntityField LAST_COMMA_FIRST_FIELD = new EntityField("eventParticipant.lastCommaFirst", "Person");
     public static final EntityField SELF_REGISTERED_FIELD = new EntityField("eventParticipant.selfRegistered", "Self Registered");
 
-    private String personId;
+    private String personId;  // TODO - basePersonId?
     private String eventId;
     private boolean selfRegistered;
     private int count;

@@ -1,6 +1,8 @@
-package xyz.cleangone.data.aws.dynamo.dao;
+package xyz.cleangone.data.aws.dynamo.dao.user;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
+import xyz.cleangone.data.aws.dynamo.dao.DynamoBaseDao;
+import xyz.cleangone.data.aws.dynamo.entity.person.Person;
 import xyz.cleangone.data.aws.dynamo.entity.person.User;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityType;
 
@@ -15,7 +17,7 @@ public class UserDao extends DynamoBaseDao<User>
 
     public List<User> getByOrg(String orgId)
     {
-        DynamoDBScanExpression scanExpression = buildEqualsScanExpression("OrgId", orgId);
+        DynamoDBScanExpression scanExpression = buildContainsScanExpression("OrgIds", orgId);
         return mapper.scan(User.class, scanExpression);
     }
 
@@ -29,8 +31,8 @@ public class UserDao extends DynamoBaseDao<User>
     {
         super.save(user);
         entityLastTouchedCache.touch(user.getId(), EntityType.Entity);
-        entityLastTouchedCache.touch(user.getOrgId(), EntityType.User);
-        setEntityLastTouched(user.getOrgId(), EntityType.User);
+//        entityLastTouchedCache.touch(user.getOrgId(), EntityType.User);
+//        setEntityLastTouched(user.getOrgId(), EntityType.User);
     }
 }
 

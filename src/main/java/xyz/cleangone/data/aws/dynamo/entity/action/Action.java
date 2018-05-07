@@ -72,8 +72,8 @@ public class Action extends BaseEntity
     {
         if (user == null) { return this; }
 
-        setSourcePersonId(user.getPersonId()); // null for on-the-fly users
-        setSourcePersonLastCommaFirst(user.getLastCommaFirst());  //todo - may break - accesses user.person
+        setSourcePersonId(user.getId()); // null for on-the-fly users
+        setSourcePersonLastCommaFirst(user.getLastCommaFirst());
         return this;
     }
 

@@ -9,49 +9,20 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @DynamoDBTable(tableName="Person")
-public class Person extends BaseEntity
+public class Person extends BasePerson
 {
-    public static final EntityField FIRST_NAME_FIELD = new EntityField("Person.firstName", "First Name");
-    public static final EntityField LAST_NAME_FIELD = new EntityField("Person.lastName", "Last Name");
     public static final EntityField TAGS_FIELD = new EntityField("Person.tags", "Tags");
 
     private String orgId;
-    private String firstName;
-    private String lastName;
     private List<String> tagIds;
     private String tagsCsv; // transient
     private String eventTagsCsv; // transient, sep fm tagsCsv to allow display in People and Participants
 
     public Person() { }
-
     public Person(String orgId, String firstName, String lastName)
     {
+        super(firstName, lastName);
         this.orgId = orgId;
-        this.firstName = firstName;
-        this.lastName = lastName;
-    }
-
-    @DynamoDBIgnore
-    public String getLastCommaFirst()
-    {
-        return lastName + ", " + firstName;
-    }
-
-    @DynamoDBIgnore
-    public String getFirstLast() { return firstName + " " +  lastName; }
-
-    public String get(EntityField field)
-    {
-        if (FIRST_NAME_FIELD.equals(field)) return getFirstName();
-        else if (LAST_NAME_FIELD.equals(field)) return getLastName();
-        else return super.get(field);
-    }
-
-    public void set(EntityField field, String value)
-    {
-        if (FIRST_NAME_FIELD.equals(field)) setFirstName(value);
-        else if (LAST_NAME_FIELD.equals(field)) setLastName(value);
-        else super.set(field, value);
     }
 
     @DynamoDBAttribute(attributeName = "OrgId")
@@ -63,14 +34,6 @@ public class Person extends BaseEntity
     {
         this.orgId = orgId;
     }
-
-    @DynamoDBAttribute(attributeName="FirstName")
-    public String getFirstName() { return firstName;}
-    public void setFirstName(String firstName) {this.firstName = firstName;}
-
-    @DynamoDBAttribute(attributeName="LastName")
-    public String getLastName() { return lastName;}
-    public void setLastName(String lastName) {this.lastName = lastName;}
 
     @DynamoDBAttribute(attributeName="TagIds")
     public List<String> getTagIds()

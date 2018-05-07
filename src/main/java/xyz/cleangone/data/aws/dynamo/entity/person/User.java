@@ -3,7 +3,6 @@ package xyz.cleangone.data.aws.dynamo.entity.person;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBIgnore;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
-import xyz.cleangone.data.aws.dynamo.entity.base.BaseMixinEntity;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityField;
 import xyz.cleangone.data.aws.dynamo.entity.organization.OrgTag;
 import xyz.cleangone.util.Crypto;
@@ -11,11 +10,9 @@ import xyz.cleangone.util.Crypto;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static java.util.Objects.requireNonNull;
 
-// NOTE: user no longer uses super.name as the username
 @DynamoDBTable(tableName="User")
-public class User extends BaseMixinEntity
+public class User extends BasePerson
 {
     public static final EntityField PASSWORD_FIELD = new EntityField("user.password", "Password");
     public static final EntityField EMAIL_FIELD = new EntityField("user.email", "Email");
@@ -24,15 +21,14 @@ public class User extends BaseMixinEntity
     public static final EntityField SHOW_BID_CONFIRM_FIELD = new EntityField("user.showBidConfirm", "Require Bid Confirmation");
     public static final EntityField SHOW_QUICK_BID_FIELD = new EntityField("user.showQuickBid", "Show QuickBid Button");
     public static final EntityField LAST_FIRST_FIELD = new EntityField("user.lastfirst", "Last, First");
-    public static final EntityField ORG_ADMIN_FIELD = new EntityField("user.transient.orgadmin", "Admin Privledge");
+    public static final EntityField ORG_ADMIN_FIELD = new EntityField("user.transient.orgAdmin", "Admin");
     public static final EntityField TAGS_FIELD = new EntityField("user.tags", "Roles");
 
-    private List<String> watchedItemIds;  // todo - would have to be moved out of core user
+    private List<String> watchedItemIds;  // todo - doesn't belong in core user
     private boolean showBidConfirm;
     private boolean showQuickBid;
 
-    private String orgId;  // null for super
-    private String personId;
+    private List<String> orgIds;  // orgs the user has interacted with
     private String encryptedPassword;
     private String email;
     private boolean emailVerified;
@@ -40,34 +36,75 @@ public class User extends BaseMixinEntity
 
     private String phone;  // todo - multiple phones, with type and acceptTexts
     private boolean acceptTexts;
+    private List<AdminPrivledge> adminPrivledges;
 
-    private List<UserPrivledge> userPrivledges;
-    private List<String> tagIds;
+    private List<String> tagIds; // userRoles
     private String tagsCsv; // transient
-    private Person person; // transient
 
     @DynamoDBIgnore
-    public boolean isSuper()
+    public boolean isSuperAdmin()
     {
-        return orgId == null;
-    }
-
-    @DynamoDBIgnore
-    public boolean isAdmin()
-    {
-        if (userPrivledges == null) { return false; }
-
-        for (UserPrivledge userPrivledge : userPrivledges)
+        if (adminPrivledges == null) { return false; }
+        for (AdminPrivledge adminPrivledge : adminPrivledges)
         {
-            if (userPrivledge.isAdmin()) { return true; }
+            if (adminPrivledge.isSuperAdmin()) { return true; }
         }
 
         return false;
     }
 
-    @DynamoDBIgnore public boolean hasPrivledge(String orgId)
+    @DynamoDBIgnore
+    public boolean isOrgAdmin(String orgId)
     {
-        return (this.orgId == null || this.orgId.equals(orgId));
+        if (adminPrivledges == null) { return false; }
+        for (AdminPrivledge adminPrivledge : adminPrivledges)
+        {
+            if (adminPrivledge.isOrgAdmin(orgId)) { return true; }
+        }
+
+        return false;
+    }
+
+    @DynamoDBIgnore
+    public boolean setOrgAdmin(String orgId)
+    {
+        if (adminPrivledges == null) { return false; }
+        for (AdminPrivledge adminPrivledge : adminPrivledges)
+        {
+            if (adminPrivledge.isOrgAdmin(orgId)) { return true; }
+        }
+
+        return false;
+    }
+
+
+    @DynamoDBIgnore
+    public boolean isEventAdmin(String orgId)
+    {
+        if (adminPrivledges == null) { return false; }
+        for (AdminPrivledge adminPrivledge : adminPrivledges)
+        {
+            if (adminPrivledge.isEventAdmin(orgId)) { return true; }
+        }
+
+        return false;
+    }
+
+    @DynamoDBIgnore
+    public boolean isEventAdmin(String orgId, String eventId)
+    {
+        if (adminPrivledges == null) { return false; }
+        for (AdminPrivledge adminPrivledge : adminPrivledges)
+        {
+            if (adminPrivledge.isEventAdmin(orgId, eventId)) { return true; }
+        }
+
+        return false;
+    }
+
+    @DynamoDBIgnore public boolean hasPassword()
+    {
+        return encryptedPassword != null;
     }
     @DynamoDBIgnore public boolean isWatching(String itemId)
     {
@@ -81,7 +118,7 @@ public class User extends BaseMixinEntity
     }
     public void setPassword(String password)
     {
-        setEncryptedPassword(encrypt(password));
+        setEncryptedPassword(password == null || password.length() == 0 ? null : encrypt(password));
     }
     public boolean passwordMatches(String password)
     {
@@ -118,24 +155,24 @@ public class User extends BaseMixinEntity
         else super.setBoolean(field, value);
     }
 
-    @DynamoDBAttribute(attributeName="OrgId")
-    public String getOrgId()
+    @DynamoDBAttribute(attributeName="OrgIds")
+    public List<String> getOrgIds()
     {
-        return orgId;
+        return orgIds;
     }
-    public void setOrgId(String orgId)
+    public void setOrgIds(List<String> orgIds)
     {
-        this.orgId = orgId;
+        this.orgIds = orgIds;
     }
 
-    @DynamoDBAttribute(attributeName="PersonId")
-    public String getPersonId()
+    // return true if orgid added, false otherwise
+    public boolean addOrgId(String orgId)
     {
-        return personId;
-    }
-    public void setPersonId(String personId)
-    {
-        this.personId = personId;
+        if (orgIds == null) { orgIds = new ArrayList<>(); }
+        if (orgIds.contains(orgId)) { return false; }
+
+        orgIds.add(orgId);
+        return true;
     }
 
     @DynamoDBAttribute(attributeName="EncryptedPassword")
@@ -212,24 +249,27 @@ public class User extends BaseMixinEntity
         this.showQuickBid = showQuickBid;
     }
 
-    @DynamoDBAttribute(attributeName = "UserPrivledges")
-    public List<UserPrivledge> getUserPrivledges()
+    @DynamoDBAttribute(attributeName = "AdminPrivledges")
+    public List<AdminPrivledge> getAdminPrivledges()
     {
-        return userPrivledges;
+        return adminPrivledges;
     }
-    public void setUserPrivledges(List<UserPrivledge> userPrivledges)
+    public void setAdminPrivledges(List<AdminPrivledge> adminPrivledges)
     {
-        this.userPrivledges = userPrivledges;
+        this.adminPrivledges = adminPrivledges;
     }
-    public void addUserPrivledge(String privledge)
+    public void addAdminPrivledge(AdminPrivledge adminPrivledge)
     {
-        if (userPrivledges == null) { userPrivledges = new ArrayList<>(); }
-
-        UserPrivledge userPrivledge = new UserPrivledge(privledge);
-        if (!userPrivledges.contains(userPrivledge))
+        if (adminPrivledges == null) { adminPrivledges = new ArrayList<>(); }
+        if (!adminPrivledges.contains(adminPrivledge))
         {
-            userPrivledges.add(userPrivledge);
+            adminPrivledges.add(adminPrivledge);
         }
+    }
+    public void removeAdminPrivledge(AdminPrivledge adminPrivledge)
+    {
+        if (adminPrivledges == null) { return; }
+        adminPrivledges.remove(adminPrivledge);
     }
 
     @DynamoDBAttribute(attributeName="TagIds")
@@ -296,43 +336,6 @@ public class User extends BaseMixinEntity
     private String encrypt(String s)
     {
         return Crypto.encrypt(Objects.requireNonNull(s));
-    }
-
-    @DynamoDBIgnore
-    public Person getPerson()
-    {
-        return person;
-    }
-    public void setPerson(Person person)
-    {
-        this.person = person;
-    }
-
-    @DynamoDBIgnore
-    public String getLastCommaFirst()
-    {
-        return person.getLastCommaFirst();
-    }
-
-    @DynamoDBIgnore
-    public boolean isOrgAdmin()
-    {
-        return isAdmin();
-    }
-    public void setOrgAdmin(boolean orgAdmin)
-    {
-        if (userPrivledges != null)
-        {
-            for (UserPrivledge userPrivledge : userPrivledges)
-            {
-                // todo - junky - refactor after Event Admin privledge added
-                userPrivledge.setPrivledge((orgAdmin ? UserPrivledge.ADMIN : null));
-                return;
-
-            }
-        }
-
-        addUserPrivledge(orgAdmin ? UserPrivledge.ADMIN : UserPrivledge.USER);
     }
 }
 

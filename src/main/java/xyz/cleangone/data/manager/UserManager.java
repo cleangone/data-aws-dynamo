@@ -3,18 +3,14 @@ package xyz.cleangone.data.manager;
 import static java.util.Objects.requireNonNull;
 
 import xyz.cleangone.data.aws.dynamo.dao.AddressDao;
-import xyz.cleangone.data.aws.dynamo.dao.UserDao;
+import xyz.cleangone.data.aws.dynamo.dao.user.UserDao;
 import xyz.cleangone.data.aws.dynamo.dao.PersonDao;
-import xyz.cleangone.data.aws.dynamo.dao.UserTokenDao;
-import xyz.cleangone.data.aws.dynamo.entity.organization.OrgTag;
-import xyz.cleangone.data.aws.dynamo.entity.organization.Organization;
+import xyz.cleangone.data.aws.dynamo.dao.user.UserTokenDao;
 import xyz.cleangone.data.aws.dynamo.entity.person.Address;
-import xyz.cleangone.data.aws.dynamo.entity.person.Person;
 import xyz.cleangone.data.aws.dynamo.entity.person.User;
 import xyz.cleangone.data.aws.dynamo.entity.person.UserToken;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class UserManager
 {
@@ -26,34 +22,10 @@ public class UserManager
     private User user;
     private UserToken userToken;
 
-    // super login, w/o org
-    public User loginSuper(String email, String password)
+    public User login(String email, String password)
     {
-        for (User foundUser : userDao.getByEmail(email))
-        {
-            if (foundUser.getOrgId() == null && foundUser.passwordMatches(password))
-            {
-                return setUser(foundUser);
-            }
-        }
-
-        user = null;
-        return null;
-    }
-
-    // login to specified org, or null for super
-    public User login(String email, String password, Organization org)
-    {
-        requireNonNull(org);
-        for (User foundUser : userDao.getByEmail(email))
-        {
-            // check that org & password match
-            if (foundUser.getOrgId() == null || foundUser.getOrgId().equals(org.getId()) &&
-                foundUser.passwordMatches(password))
-            {
-                return setUser(foundUser);
-            }
-        }
+        User foundUser = getUserWithEmail(email);
+        if (foundUser != null && foundUser.passwordMatches(password)) { return setUser(foundUser); }
 
         user = null;
         return null;
@@ -73,28 +45,21 @@ public class UserManager
         return (user == null ?  null : setUser(user));
     }
 
-    public boolean userIsAdmin(Organization org)
+    public boolean userIsSuperAdmin()
+    {
+        return (user != null && user.isSuperAdmin());
+    }
+
+    public boolean userIsOrgAdmin(String orgId)
     {
         if (user == null) { return false; }
-
-        return (user.isSuper() || (user.getOrgId().equals(org.getId()) &&  user.isAdmin()));
+        return (user.isSuperAdmin() || user.isOrgAdmin(orgId));
     }
 
-    public boolean userHasEventAdmin(Organization org, List<OrgTag> eventAdminRoleTags)
+    public boolean userIsEventAdmin(String orgId)
     {
-        if (user == null || !user.getOrgId().equals(org.getId())) { return false; }
-
-        for (OrgTag tag : eventAdminRoleTags)
-        {
-            if (user.getTagIds().contains(tag.getId())) { return true; }
-        }
-
-        return false;
-    }
-
-    public boolean userIsSuper()
-    {
-        return (user != null && user.isSuper());
+        if (user == null) { return false; }
+        return (user.isEventAdmin(orgId));
     }
 
     public void logout()
@@ -112,51 +77,37 @@ public class UserManager
         }
     }
 
-    public User createUser(String email, String personId, String orgId)
+    public User createUser(String email, String firstName, String lastName, String orgId)
     {
-        return createUser(email, null, personId, orgId);
-    }
-
-    public User createUser(String email, String password, String personId, String orgId)
-    {
-        requireNonNull(email);
-        requireNonNull(personId);
-
-        if (emailExists(email, orgId))
+        if (emailExists(requireNonNull(email)))
         {
             // should have been checked
-            throw new RuntimeException("Username already exists");
+            throw new RuntimeException("Email already exists");
         }
 
         User newUser = new User();
         newUser.setEmail(email);
-        newUser.setPersonId(personId);
-        newUser.setOrgId(orgId);
-        if (password != null) { newUser.setPassword(password); }
+        if (firstName != null) { newUser.setFirstName(firstName); }
+        if (lastName != null) { newUser.setLastName(lastName); }
+        if (orgId != null) { newUser.addOrgId(orgId); }
 
         userDao.save(newUser);
         return newUser;
     }
 
-    public boolean emailExists(String email, String orgId)
+    public boolean emailExists(String email)
     {
-        List<User> existingUsers = userDao.getByEmail(email).stream()
-            .filter(user -> (user.getOrgId() == null || user.getOrgId().equals(orgId)))
-            .collect(Collectors.toList());
-
-        return !existingUsers.isEmpty();
+        return getUserWithEmail(email) != null;
     }
 
-    public User getUserWithEmail(String email, String orgId)
+    public User getUserWithEmail(String email)
     {
-        List<User> users = userDao.getByOrg(orgId).stream()
-            .filter(user -> email.equals(user.getEmail()))
-            .collect(Collectors.toList());
+        List<User> users = userDao.getByEmail(email);
 
         if (users.isEmpty()) { return null; }
 
-        // todo = log
-        if (users.size() > 1) { throw new IllegalStateException("More than one user in org " + orgId + " has email " + email); }
+        // todo - log
+        if (users.size() > 1) { throw new IllegalStateException("More than one user has email " + email); }
 
         return users.get(0);
     }
@@ -194,18 +145,12 @@ public class UserManager
     {
         // todo - verify user.id set and person found
         this.user = user;
-        user.setPerson(personDao.getById(user.getPersonId()));
-
         return user;
     }
 
-    public Person getPerson()
+    public String getFirstName()
     {
-        return user.getPerson();
-    }
-    public String getPersonFirstName()
-    {
-        return user == null ? null : user.getPerson().getFirstName();
+        return user == null ? null : user.getFirstName();
     }
 
     public User copyUser()
@@ -213,15 +158,10 @@ public class UserManager
         if (user == null) { return null; }
 
         User copiedUser = new User();
-        copiedUser.setPersonId(user.getPersonId());
+        copiedUser.setFirstName(user.getFirstName());
+        copiedUser.setLastName(user.getLastName());
         copiedUser.setEmail(user.getEmail());
         copiedUser.setAddressId(user.getAddressId());
-
-        Person copiedPerson = new Person();
-        copiedUser.setPerson(copiedPerson);
-        copiedPerson.setId(user.getPerson().getId());
-        copiedPerson.setFirstName(user.getPerson().getFirstName());
-        copiedPerson.setLastName(user.getPerson().getLastName());
 
         return copiedUser;
     }

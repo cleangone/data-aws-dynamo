@@ -2,6 +2,9 @@ package xyz.cleangone.data.manager;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.S3Link;
 import xyz.cleangone.data.aws.dynamo.dao.*;
+import xyz.cleangone.data.aws.dynamo.dao.event.EventDao;
+import xyz.cleangone.data.aws.dynamo.dao.event.EventDateDao;
+import xyz.cleangone.data.aws.dynamo.dao.event.EventParticipantDao;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityType;
 import xyz.cleangone.data.aws.dynamo.entity.image.ImageType;
 import xyz.cleangone.data.aws.dynamo.entity.item.CatalogItem;
@@ -195,7 +198,7 @@ public class EventManager implements ImageContainerManager
 
     public EventParticipant getEventParticipant(User user)
     {
-        return getEventParticipant(user.getPersonId());
+        return getEventParticipant(user.getId());
     }
 
     public EventParticipant getEventParticipant(String personId)
@@ -218,20 +221,21 @@ public class EventManager implements ImageContainerManager
     {
         if (getEventParticipant(user) != null) { return; }
 
-        EventParticipant participant = new EventParticipant(user.getPersonId(), event.getId());
+        EventParticipant participant = new EventParticipant(user.getId(), event.getId());
         participant.setSelfRegistered(true);
         eventParticipantDao.save(participant);
 
-        if (!eventTags.isEmpty())
-        {
-            List<String> eventTagIds = eventTags.stream()
-                .map(OrgTag::getId)
-                .collect(Collectors.toList());
-
-            Person person = personDao.getById(user.getPersonId());
-            person.getTagIds().addAll(eventTagIds);
-            personDao.save(person);
-        }
+        // todo - these need to be user.roles
+//        if (!eventTags.isEmpty())
+//        {
+//            List<String> eventTagIds = eventTags.stream()
+//                .map(OrgTag::getId)
+//                .collect(Collectors.toList());
+//
+//            Person person = personDao.getById(user.getPersonId());
+//            person.getTagIds().addAll(eventTagIds);
+//            personDao.save(person);
+//        }
     }
 
     // add selectedTags, remove any visibleTags that are not selected

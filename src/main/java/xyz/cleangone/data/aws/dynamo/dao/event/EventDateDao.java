@@ -1,6 +1,7 @@
-package xyz.cleangone.data.aws.dynamo.dao;
+package xyz.cleangone.data.aws.dynamo.dao.event;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
+import xyz.cleangone.data.aws.dynamo.dao.DynamoBaseDao;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityType;
 import xyz.cleangone.data.aws.dynamo.entity.organization.EventDate;
 
