@@ -10,7 +10,6 @@ import xyz.cleangone.data.aws.dynamo.entity.base.BaseEntity;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityLastTouched;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityType;
 import xyz.cleangone.data.cache.EntityLastTouchedCache;
-import xyz.cleangone.util.CleangoneEnv;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -59,7 +58,7 @@ public class DynamoBaseDao <T extends BaseEntity>
 
     public S3Link createS3Link(String filePath)
     {
-        return mapper.createS3Link(AwsClientFactory.getRegion(), CleangoneEnv.BUCKET_NAME, filePath);
+        return mapper.createS3Link(AwsClientFactory.getRegionName(), AwsClientFactory.getBucketName(), filePath);
     }
 
     protected DynamoDBScanExpression byOrgId(String id)
@@ -74,7 +73,6 @@ public class DynamoBaseDao <T extends BaseEntity>
     {
         return buildEqualsScanExpression("Tag", tag);
     }
-
 
     public DynamoDBScanExpression buildEqualsScanExpression(String name, String value)
     {

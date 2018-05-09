@@ -17,8 +17,6 @@ public class OrgTag extends BaseMixinEntity implements Comparable<OrgTag>
 
     public enum TagType { PersonTag, Category, UserRole }
 
-    public static String ADMIN_ROLE_NAME = "Admin";
-
     public static String USER = "user";
 
     // todo - add a list of permanent tag names, i.e. Notifications, EVENT_ADMIN ?
@@ -72,13 +70,7 @@ public class OrgTag extends BaseMixinEntity implements Comparable<OrgTag>
         int displayOrderCompare = displayOrder == null ? 0 : getDisplayOrder().compareTo(that.getDisplayOrder());
         return displayOrderCompare == 0 ? getName().compareToIgnoreCase(that.getName()) : displayOrderCompare;
     }
-
-    @DynamoDBIgnore
-    public boolean isAdminRole()
-    {
-        return this.tagType == TagType.UserRole && ADMIN_ROLE_NAME.equals(getName());
-    }
-
+    
     @DynamoDBIgnore
     public boolean isTagType(TagType tagType)
     {

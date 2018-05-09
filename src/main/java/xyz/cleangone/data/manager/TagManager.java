@@ -128,20 +128,6 @@ public class TagManager
             .collect(Collectors.toList());
     }
 
-    public List<OrgTag> getEventAdminRoleTags()
-    {
-        return getTags(OrgTag.TagType.UserRole).stream()
-            .filter(t -> t.getEventId() != null)
-            .filter(t -> OrgTag.ADMIN_ROLE_NAME.equals(t.getName()))
-            .collect(Collectors.toList());
-    }
-
-    public Map<String, OrgTag> getEventAdminRoleTagsById()
-    {
-        return getEventAdminRoleTags().stream()
-            .collect(Collectors.toMap(BaseEntity::getId, Function.identity()));
-    }
-
     public Map<String, OrgTag> getTagsById()
     {
         return getTagsById(getTags());

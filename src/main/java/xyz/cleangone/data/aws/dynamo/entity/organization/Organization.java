@@ -7,6 +7,7 @@ import xyz.cleangone.data.aws.dynamo.entity.image.ImageContainer;
 @DynamoDBTable(tableName="Organization")
 public class Organization extends BaseOrg implements ImageContainer
 {
+    public static final EntityField IS_DEFAULT_FIELD = new EntityField("org.isDefailt", "Default Org");
     public static final EntityField LEFT_WIDTH_FIELD = new EntityField("org.leftColWidth", "Left Col. Width");
     public static final EntityField CENTER_WIDTH_FIELD = new EntityField("org.centerColWidth", "Center Col. Width");
     public static final EntityField RIGHT_WIDTH_FIELD = new EntityField("org.rightColWidth", "Right Col. Width");
@@ -16,16 +17,16 @@ public class Organization extends BaseOrg implements ImageContainer
     public static final EntityField EVENT_CAPTION_FIELD = new EntityField("org.eventCaption", "Event Caption");
     public static final EntityField EVENT_CAPTION_PLURAL_FIELD = new EntityField("org.eventCaptionPlural", "Event Caption Plural");
 
+    private boolean isDefault;
     private int leftColWidth;
     private int centerColWidth;
     private int rightColWidth;
     private int maxLeftColWidth;
     private int maxCenterColWidth;
     private int maxRightColWidth;
-
     private String paymentProcessorId;
 
-    // todo - Plural obj - can dynamo store pojo inline? would also used by event.iterationLabel
+    // todo - Plural obj - use dynamo inline string pojo - would also used by event.iterationLabel
     private String eventCaption;   // display name for Events - for when they are used to manage some other type of thing
     private String eventCaptionPlural;
 
@@ -51,6 +52,18 @@ public class Organization extends BaseOrg implements ImageContainer
         if (EVENT_CAPTION_FIELD.equals(field)) setEventCaption(value);
         else if (EVENT_CAPTION_PLURAL_FIELD.equals(field)) setEventCaptionPlural(value);
         else super.set(field, value);
+    }
+
+    public boolean getBoolean(EntityField field)
+    {
+        if (IS_DEFAULT_FIELD.equals(field)) return getIsDefault();
+        else return super.getBoolean(field);
+    }
+
+    public void setBoolean(EntityField field, boolean value)
+    {
+        if (IS_DEFAULT_FIELD.equals(field)) setIsDefault(value);
+        else super.setBoolean(field, value);
     }
 
     public int getInt(EntityField field)
@@ -79,6 +92,15 @@ public class Organization extends BaseOrg implements ImageContainer
     public boolean colWidthsSet()
     {
         return (leftColWidth != 0 || centerColWidth != 0 || rightColWidth != 0);
+    }
+
+    public boolean getIsDefault()
+    {
+        return isDefault;
+    }
+    public void setIsDefault(boolean aDefault)
+    {
+        isDefault = aDefault;
     }
 
     @DynamoDBAttribute(attributeName = "LeftColWidth")

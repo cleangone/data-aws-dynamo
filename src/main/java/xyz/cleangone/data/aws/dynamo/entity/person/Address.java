@@ -5,7 +5,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import xyz.cleangone.data.aws.dynamo.entity.base.BaseMixinEntity;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityField;
 
-@DynamoDBTable(tableName="User")
+@DynamoDBTable(tableName="Address")
 public class Address extends BaseMixinEntity
 {
     public static final EntityField ADDRESS_FIELD = new EntityField("Address.streetAddress", "Address");

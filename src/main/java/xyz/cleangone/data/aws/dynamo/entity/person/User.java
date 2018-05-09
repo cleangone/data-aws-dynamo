@@ -4,6 +4,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBIgnore;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityField;
+import xyz.cleangone.data.aws.dynamo.entity.organization.OrgEvent;
 import xyz.cleangone.data.aws.dynamo.entity.organization.OrgTag;
 import xyz.cleangone.util.Crypto;
 
@@ -21,7 +22,7 @@ public class User extends BasePerson
     public static final EntityField SHOW_BID_CONFIRM_FIELD = new EntityField("user.showBidConfirm", "Require Bid Confirmation");
     public static final EntityField SHOW_QUICK_BID_FIELD = new EntityField("user.showQuickBid", "Show QuickBid Button");
     public static final EntityField LAST_FIRST_FIELD = new EntityField("user.lastfirst", "Last, First");
-    public static final EntityField ORG_ADMIN_FIELD = new EntityField("user.transient.orgAdmin", "Admin");
+    public static final EntityField ADMIN_FIELD = new EntityField("user.transient.admin", "Admin");
     public static final EntityField TAGS_FIELD = new EntityField("user.tags", "Roles");
 
     private List<String> watchedItemIds;  // todo - doesn't belong in core user
@@ -100,6 +101,17 @@ public class User extends BasePerson
         }
 
         return false;
+    }
+
+    @DynamoDBIgnore
+    public List<String> getAdminPrivledgeEventIds(String orgId)
+    {
+        if (adminPrivledges == null) { return Collections.emptyList(); }
+
+        return adminPrivledges.stream()
+            .filter(priv -> priv.isEventAdmin(orgId))
+            .map(AdminPrivledge::getEventId)
+            .collect(Collectors.toList());
     }
 
     @DynamoDBIgnore public boolean hasPassword()
@@ -258,6 +270,10 @@ public class User extends BasePerson
     {
         this.adminPrivledges = adminPrivledges;
     }
+    public void addAdminPrivledge(OrgEvent event)
+    {
+        addAdminPrivledge(new AdminPrivledge(event));
+    }
     public void addAdminPrivledge(AdminPrivledge adminPrivledge)
     {
         if (adminPrivledges == null) { adminPrivledges = new ArrayList<>(); }
@@ -265,6 +281,10 @@ public class User extends BasePerson
         {
             adminPrivledges.add(adminPrivledge);
         }
+    }
+    public void removeAdminPrivledge(OrgEvent event)
+    {
+        removeAdminPrivledge(new AdminPrivledge(event));
     }
     public void removeAdminPrivledge(AdminPrivledge adminPrivledge)
     {

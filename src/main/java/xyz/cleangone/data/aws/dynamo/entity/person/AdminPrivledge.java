@@ -1,6 +1,7 @@
 package xyz.cleangone.data.aws.dynamo.entity.person;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.*;
+import xyz.cleangone.data.aws.dynamo.entity.organization.OrgEvent;
 
 import java.util.Objects;
 
@@ -15,6 +16,7 @@ public class AdminPrivledge
     {
         this.orgId = orgId;
     }
+    public AdminPrivledge(OrgEvent event) { this(event.getOrgId(), event.getId()); }
     public AdminPrivledge(String orgId, String eventId)
     {
         this.orgId = orgId;

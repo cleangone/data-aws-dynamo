@@ -16,6 +16,7 @@ import xyz.cleangone.data.aws.dynamo.entity.purchase.Cart;
 import xyz.cleangone.data.cache.EntityCache;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,6 +37,10 @@ public class ActionManager
         this.org = requireNonNull(org);
     }
 
+    public List<Action> getActionsByTargetEvent(OrgEvent targetEvent, ActionType... actionTypes)
+    {
+        return filter(getActionsByTargetEvent(targetEvent), actionTypes);
+    }
     public List<Action> getActionsByTargetEvent(OrgEvent targetEvent)
     {
         Date start = new Date();
@@ -73,6 +78,15 @@ public class ActionManager
     {
         return getActionsBySourcePerson(sourcePersonId).stream()
             .filter(a -> eventId.equals(a.getTargetEventId()))
+            .collect(Collectors.toList());
+    }
+
+    protected List<Action> filter(List<Action> actions, ActionType... actionTypes)
+    {
+        List<ActionType> actionTypeList = Arrays.asList(actionTypes);
+
+        return actions.stream()
+            .filter(a -> actionTypeList.contains(a.getActionType()))
             .collect(Collectors.toList());
     }
 

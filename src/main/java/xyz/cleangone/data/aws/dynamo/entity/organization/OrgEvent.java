@@ -3,6 +3,7 @@ package xyz.cleangone.data.aws.dynamo.entity.organization;
 import com.amazonaws.services.dynamodbv2.datamodeling.*;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityField;
 import xyz.cleangone.data.aws.dynamo.entity.image.ImageContainer;
+import xyz.cleangone.data.aws.dynamo.entity.person.AdminPrivledge;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,6 +44,8 @@ public class OrgEvent extends BaseOrg implements ImageContainer
     private int estimatedIterations;
     private boolean userCanRegister;
     private boolean eventCompleted;
+    private List<EventAdminSection> eventAdminSections;
+
 
     public OrgEvent()
     {
@@ -272,6 +275,15 @@ public class OrgEvent extends BaseOrg implements ImageContainer
         this.userCanRegister = userCanRegister;
     }
 
+    @DynamoDBAttribute(attributeName = "EventAdminSections")
+    public List<EventAdminSection> getEventAdminSections()
+    {
+        return eventAdminSections;
+    }
+    public void setEventAdminSections(List<EventAdminSection> eventAdminSections)
+    {
+        this.eventAdminSections = eventAdminSections;
+    }
 
     @Override
     public boolean equals(Object o)

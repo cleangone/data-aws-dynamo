@@ -3,14 +3,14 @@ package xyz.cleangone.data.aws;
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
+import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.datamodeling.S3Link;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import xyz.cleangone.util.env.EnvManager;
 
-
-import static xyz.cleangone.util.CleangoneEnv.*;
 import static java.util.Objects.requireNonNull;
 
 public class AwsClientFactory
@@ -24,7 +24,6 @@ public class AwsClientFactory
     public static AwsClientFactory getInstance()
     {
         if (instance == null) { instance = new AwsClientFactory(); }
-
         return instance;
     }
 
@@ -34,11 +33,11 @@ public class AwsClientFactory
         catch (Exception e) { throw new AmazonClientException("Cannot load credentials from ProviderChain", e); }
 
         dynamoBuilder = AmazonDynamoDBClientBuilder.standard()
-            .withRegion(REGION)
+            .withRegion(getRegion())
             .withCredentials(credentialsProvider);
 
         s3Builder = AmazonS3ClientBuilder.standard()
-            .withRegion(REGION)
+            .withRegion(getRegion())
             .withCredentials(credentialsProvider);
     }
 
@@ -52,18 +51,26 @@ public class AwsClientFactory
         // https://<region>.amazonaws.com/<bucket>/org/big/banner/squirrel.png
 
         String url = requireNonNull(s3Link).getUrl().toString();
-        if (!url.contains(getRegion())) { throw new RuntimeException("s3Link " + url + " does not contain region " + getRegion()); }
-        if (!url.contains(BUCKET_NAME)) { throw new RuntimeException("s3Link " + url + " does not contain bucket " + BUCKET_NAME); }
+        if (!url.contains(getRegionName())) { throw new RuntimeException("s3Link " + url + " does not contain region " + getRegionName()); }
+        if (!url.contains(getBucketName())) { throw new RuntimeException("s3Link " + url + " does not contain bucket " + getBucketName()); }
 
         String key = requireNonNull(s3Link).getKey();
-        String newUrl = "https://s3-" + getRegion() + ".amazonaws.com/" + BUCKET_NAME + "/" + key;
+        String newUrl = "https://s3-" + getRegion() + ".amazonaws.com/" + getBucketName() + "/" + key;
 
         return newUrl;
     }
 
-    public static String getRegion()
+    public static String getBucketName()
     {
-        return REGION.getName();
+        return EnvManager.getEnv().getBucketName();
+    }
+    public static Regions getRegion()
+    {
+        return EnvManager.getEnv().getRegion();
+    }
+    public static String getRegionName()
+    {
+        return getRegion().getName();
     }
 
     public AmazonDynamoDB createDynamoClient()
