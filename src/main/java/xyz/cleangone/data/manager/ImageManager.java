@@ -73,4 +73,12 @@ public class ImageManager
     {
         return AwsClientFactory.getPublicUrl(image);
     }
+    public static String getGradientUrl()
+    {
+        return getBaseUrl() + "banner/gradient.png";
+    }
+    public static String getBaseUrl()
+    {
+        return AwsClientFactory.getBaseImageUrl();
+    }
 }

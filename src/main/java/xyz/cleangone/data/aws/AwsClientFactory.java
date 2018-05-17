@@ -55,9 +55,12 @@ public class AwsClientFactory
         if (!url.contains(getBucketName())) { throw new RuntimeException("s3Link " + url + " does not contain bucket " + getBucketName()); }
 
         String key = requireNonNull(s3Link).getKey();
-        String newUrl = "https://s3-" + getRegion() + ".amazonaws.com/" + getBucketName() + "/" + key;
+        return getBaseImageUrl() + key;
+    }
 
-        return newUrl;
+    public static String getBaseImageUrl()
+    {
+        return "https://s3-" + getRegionName() + ".amazonaws.com/" + getBucketName() + "/";
     }
 
     public static String getBucketName()

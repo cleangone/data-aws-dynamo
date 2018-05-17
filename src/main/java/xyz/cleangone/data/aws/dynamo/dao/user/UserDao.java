@@ -2,7 +2,6 @@ package xyz.cleangone.data.aws.dynamo.dao.user;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import xyz.cleangone.data.aws.dynamo.dao.DynamoBaseDao;
-import xyz.cleangone.data.aws.dynamo.entity.person.Person;
 import xyz.cleangone.data.aws.dynamo.entity.person.User;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityType;
 
@@ -13,6 +12,11 @@ public class UserDao extends DynamoBaseDao<User>
     public User getById(String id)
     {
         return mapper.load(User.class, id);
+    }
+
+    public List<User> getAll()
+    {
+        return mapper.scan(User.class, new DynamoDBScanExpression());
     }
 
     public List<User> getByOrg(String orgId)

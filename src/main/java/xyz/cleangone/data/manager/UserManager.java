@@ -22,6 +22,11 @@ public class UserManager
     private User user;
     private UserToken userToken;
 
+    public List<User> getUsers()
+    {
+        return userDao.getAll();
+    }
+
     public User login(String email, String password)
     {
         User foundUser = getUserWithEmail(email);
