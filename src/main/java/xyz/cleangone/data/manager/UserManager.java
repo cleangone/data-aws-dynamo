@@ -263,24 +263,6 @@ public class UserManager
         return token;
     }
 
-    public void addTagId(String tagId, List<User> users)
-    {
-        for (User user : users)
-        {
-            user.addTagId(tagId);
-            userDao.save(user);
-        }
-    }
-
-    public void removeTagId(String tagId, List<User> users)
-    {
-        for (User user : users)
-        {
-            user.removeTagId(tagId);
-            userDao.save(user);
-        }
-    }
-
     public UserDao getUserDao()
     {
         return userDao;

@@ -8,12 +8,8 @@ import xyz.cleangone.data.aws.dynamo.dao.event.EventParticipantDao;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityType;
 import xyz.cleangone.data.aws.dynamo.entity.image.ImageType;
 import xyz.cleangone.data.aws.dynamo.entity.item.CatalogItem;
-import xyz.cleangone.data.aws.dynamo.entity.organization.EventDate;
-import xyz.cleangone.data.aws.dynamo.entity.organization.EventParticipant;
-import xyz.cleangone.data.aws.dynamo.entity.organization.OrgEvent;
-import xyz.cleangone.data.aws.dynamo.entity.organization.Organization;
+import xyz.cleangone.data.aws.dynamo.entity.organization.*;
 import xyz.cleangone.data.aws.dynamo.entity.person.Person;
-import xyz.cleangone.data.aws.dynamo.entity.organization.OrgTag;
 import xyz.cleangone.data.aws.dynamo.entity.person.User;
 import xyz.cleangone.data.cache.EntityCache;
 import xyz.cleangone.data.manager.event.ItemManager;
@@ -91,6 +87,12 @@ public class EventManager implements ImageContainerManager
     {
         return getEvents().stream()
             .collect(Collectors.toMap(OrgEvent::getId, event -> event));
+    }
+
+    public Map<String, OrgEvent> getEventsByName()
+    {
+        return getEvents().stream()
+            .collect(Collectors.toMap(OrgEvent::getName, event -> event));
     }
 
     public OrgEvent createEvent(String name)
@@ -178,6 +180,7 @@ public class EventManager implements ImageContainerManager
     public void delete(EventParticipant participant)
     {
         eventParticipantDao.delete(participant);
+        PARTICIPANT_CACHE.clear(participant.getEventId());
     }
 
     public void addEventParticipants(List<Person> people)
@@ -186,14 +189,18 @@ public class EventManager implements ImageContainerManager
             .map(EventParticipant::getPersonId)
             .collect(Collectors.toList());
 
+        boolean participantAdded = false;
         for (Person person : people)
         {
             if (!currParticipantPersonIds.contains(person.getId()))
             {
                 EventParticipant participant = new EventParticipant(person.getId(), event.getId());
                 eventParticipantDao.save(participant);
+                participantAdded = true;
             }
         }
+
+        if (participantAdded) { PARTICIPANT_CACHE.clear(event.getId()); }
     }
 
     public EventParticipant getEventParticipant(User user)
@@ -224,6 +231,7 @@ public class EventManager implements ImageContainerManager
         EventParticipant participant = new EventParticipant(user.getId(), event.getId());
         participant.setSelfRegistered(true);
         eventParticipantDao.save(participant);
+        PARTICIPANT_CACHE.clear(event.getId());
 
         // todo - these need to be user.roles
 //        if (!eventTags.isEmpty())
@@ -294,20 +302,31 @@ public class EventManager implements ImageContainerManager
     // Tags
     //
 
-    public List<String> getCategoryIds()
-    {
-        return event.getCategoryIds();
-    }
-    public List<String> getEventTagIds(OrgTag.TagType tagType)
-    {
-        return tagType == OrgTag.TagType.Category ?  event.getCategoryIds() : event.getTagIds();
-    }
+//    public List<String> getCategoryIds()
+//    {
+//        return event.getCategoryIds();
+//    }
+//    public List<String> getEventTagIds(String tagTypeName)
+//    {
+//        return TagType.CATEGORY_TAG_TYPE.equals(tagTypeName) ?  event.getCategoryIds() : event.getTagIds();
+//    }
+//
+//    public void setEventTagIds(List<String> tagIds, String tagTypeName)
+//    {
+//        if (TagType.CATEGORY_TAG_TYPE.equals(tagTypeName)) { event.setCategoryIds(tagIds); }
+//        else { event.setTagIds(tagIds); }
+//    }
 
-    public void setEventTagIds(List<String> tagIds, OrgTag.TagType tagType)
-    {
-        if (tagType == OrgTag.TagType.Category) { event.setCategoryIds(tagIds); }
-        else { event.setTagIds(tagIds); }
-    }
+//    public List<String> getEventTagIds(String tagTypeName)
+//    {
+//        return TagType.CATEGORY_TAG_TYPE.equals(tagTypeName) ?  null : event.getTagIds();
+//    }
+//
+//    public void setEventTagIds(List<String> tagIds, String tagTypeName)
+//    {
+//        if (TagType.CATEGORY_TAG_TYPE.equals(tagTypeName)) { ; }
+//        else { event.setTagIds(tagIds); }
+//    }
 
     public OrgTag getCategory()
     {

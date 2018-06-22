@@ -9,6 +9,7 @@ public enum EntityType
     Bid,
     User,
     Tag,
+    TagType,
     PersonTag,
     Category,
     Participant,

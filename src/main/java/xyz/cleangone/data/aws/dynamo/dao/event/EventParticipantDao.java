@@ -17,11 +17,20 @@ public class EventParticipantDao extends DynamoBaseDao<EventParticipant>
 
     public void save(EventParticipant participant)
     {
-        super.save(participant);
         entityLastTouchedCache.touch(participant.getEventId(), EntityType.Participant);
 
         // participants are cached by eventId
         setEntityLastTouched(participant.getEventId(), EntityType.Participant);
+
+        super.save(participant);
+    }
+
+    public void delete(EventParticipant participant)
+    {
+        entityLastTouchedCache.touch(participant.getEventId(), EntityType.Participant);
+        setEntityLastTouched(participant.getEventId(), EntityType.Participant);
+
+        super.delete(participant);
     }
 }
 

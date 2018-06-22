@@ -24,6 +24,7 @@ public class CatalogItem extends PurchaseItem implements ImageContainer
     public static final EntityField DROP_WINDOW_FIELD     = new EntityField("item.dropWindow", "Drop Window (Min)");
     public static final EntityField RELATIVE_WIDTH_FIELD  = new EntityField("item.relativeWidth", "Relative Width");
     public static long ONE_MINUTE = 1000*60;
+    private static String CATEGORY_TAG_TYPE_ID_PLACEHOLDER = "category";
 
     private String orgId;
     protected SaleType saleType = SaleType.Purchase;
@@ -38,9 +39,10 @@ public class CatalogItem extends PurchaseItem implements ImageContainer
     private Integer relativeWidth; // 2 = 2x normal, etc, null is default
     private List<S3Link> images;
     private List<String> categoryIds;
+    private List<String> tagIds; // tags other than category - may change to Map<String, List<String>> tagTypeIdToTagIds;
     private String highBidId;
     private String highBidderId;  // denormalized for speed
-    private String categoriesCsv; // transient
+    private Map<String, String> tagTypeIdToTagsCsv = new HashMap<>(); // transient
 
     public CatalogItem() {}
     public CatalogItem(String name, String orgId, String eventId)
@@ -221,16 +223,11 @@ public class CatalogItem extends PurchaseItem implements ImageContainer
     }
 
     @DynamoDBAttribute(attributeName="CategoryIds")
-    public List<String> getCategoryIds()
-    {
-        if (categoryIds == null) { categoryIds = new ArrayList<>(); }
-        return categoryIds;
-    }
+    public List<String> getCategoryIds() { if (categoryIds == null) { categoryIds = new ArrayList<>(); } return categoryIds; }
     public void setCategoryIds(List<String> categoryIds)
     {
         this.categoryIds = categoryIds;
     }
-
     public void addCategoryId(String categoryId)
     {
         if (!getCategoryIds().contains(categoryId)) { categoryIds.add(categoryId); }
@@ -238,6 +235,21 @@ public class CatalogItem extends PurchaseItem implements ImageContainer
     public void removeCategoryId(String categoryId)
     {
         categoryIds.remove(categoryId);
+    }
+
+    @DynamoDBAttribute(attributeName="TagIds")
+    public List<String> getTagIds() { if (tagIds == null) { tagIds = new ArrayList<>(); } return tagIds; }
+    public void setTagIds(List<String> tagIds)
+    {
+        this.tagIds = tagIds;
+    }
+    public void addTagId(String tagId)
+    {
+        if (!getTagIds().contains(tagId)) { tagIds.add(tagId); }
+    }
+    public void removeTagId(String tagId)
+    {
+        getTagIds().remove(tagId);
     }
 
     @DynamoDBAttribute(attributeName="HighBidId")
@@ -260,25 +272,50 @@ public class CatalogItem extends PurchaseItem implements ImageContainer
         this.highBidderId = highBidderId;
     }
 
+//    @DynamoDBIgnore public void setCategoryTagTypeId(String categoryTagTypeId) { this.categoryTagTypeId = categoryTagTypeId; }
+
+//    @DynamoDBIgnore
+//    public List<String> getCategoryIds()
+//    {
+//        return getTagIds().stream()
+//            .filter(t -> t.getTagTypeId().equals(tagTypeId)) // filter for specified tageTypeId
+//            .map(OrgTag::getName)
+//            .collect(Collectors.toList());
+//
+//
+//
+//        if (categoryIds == null) { categoryIds = new ArrayList<>(); }
+//        return categoryIds;
+//    }
+
+
     @DynamoDBIgnore
-    public String getCategoriesCsv() { return categoriesCsv; }
-    public void setCategoriesCsv(Map<String, OrgTag> tagsById)
+    public String getTagsCsv(String tagTypeId) { return tagTypeIdToTagsCsv.get(tagTypeId); }
+    public void setTagsCsv(String tagTypeId, Map<String, OrgTag> tagIdToTag)
     {
-        categoriesCsv = getCsv(tagsById);
+        tagTypeIdToTagsCsv.put(tagTypeId, getCsv(tagTypeId, getTagIds(), tagIdToTag));
     }
 
-    private String getCsv(Map<String, OrgTag> tagsById)
+    @DynamoDBIgnore
+    public String getCategoriesCsv() { return tagTypeIdToTagsCsv.get(CATEGORY_TAG_TYPE_ID_PLACEHOLDER); }
+    public void setCategorieCsv(Map<String, OrgTag> tagIdToTag)
     {
-        if (getCategoryIds().isEmpty()) { return ""; }
+        tagTypeIdToTagsCsv.put(CATEGORY_TAG_TYPE_ID_PLACEHOLDER, getCsv(null, getCategoryIds(), tagIdToTag));
+    }
 
-        List<String> categoryNames = categoryIds.stream()
-            .filter(id -> tagsById.containsKey(id)) // map may be of a subset of tags
-            .map(id -> tagsById.get(id))
+    private String getCsv(String tagTypeId, List<String> tagIds, Map<String, OrgTag> tagIdToTag)
+    {
+        if (tagIds.isEmpty()) { return ""; }
+
+        List<String> tagNames = tagIds.stream()
+            .filter(id -> tagIdToTag.containsKey(id)) // map may be of a subset of tags
+            .map(id -> tagIdToTag.get(id))
+            .filter(t -> (tagTypeId == null || t.getTagTypeId().equals(tagTypeId))) // filter for tagTypeId if specified
             .map(OrgTag::getName)
             .collect(Collectors.toList());
 
-        Collections.sort(categoryNames);
-        return categoryNames.stream().collect(Collectors.joining(", "));
+        Collections.sort(tagNames);
+        return tagNames.stream().collect(Collectors.joining(", "));
     }
 }
 

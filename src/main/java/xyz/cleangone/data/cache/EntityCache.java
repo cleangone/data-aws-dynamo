@@ -33,6 +33,14 @@ public class EntityCache <T extends BaseEntity>
         this.maxEntities = maxEntities;
     }
 
+    public void clear(BaseMixinEntity entity) { clear(entity.getId()); }
+    public void clear(String entityId)
+    {
+        entityIdToEntityCacheItems.put(entityId, null);
+        entityIdLastChecked.put(entityId, null);
+        entityIds.remove(entityId);
+    }
+
     public List<T> get(Organization org)
     {
         return get(org, org.getId());

@@ -3,7 +3,6 @@ package xyz.cleangone.data.aws.dynamo.entity.organization;
 import com.amazonaws.services.dynamodbv2.datamodeling.*;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityField;
 import xyz.cleangone.data.aws.dynamo.entity.image.ImageContainer;
-import xyz.cleangone.data.aws.dynamo.entity.person.AdminPrivledge;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,8 +33,8 @@ public class OrgEvent extends BaseOrg implements ImageContainer
     private boolean useOrgBanner;
 
     // todo - change to personTagIds
-    private List<String> tagIds; // the org-wide tags this event is interested in
-    private List<String> categoryIds; // the org-wide categories this event is interested in
+//    private List<String> tagIds; // the org-wide tags this event is interested in
+//    private List<String> categoryIds; // the org-wide categories this event is interested in
     private boolean displayCategories;
     private boolean acceptDonations;
     private boolean acceptPledges;
@@ -114,13 +113,13 @@ public class OrgEvent extends BaseOrg implements ImageContainer
         else super.setInt(field, value);
     }
 
-    @DynamoDBIgnore
-    public List<String> getTagIds(OrgTag.TagType tagType)
-    {
-        if (tagType == OrgTag.TagType.PersonTag) { return getTagIds(); }
-        else if (tagType == OrgTag.TagType.Category) { return getCategoryIds(); }
-        else return Collections.emptyList();
-    }
+//    @DynamoDBIgnore
+//    public List<String> getTagIds(String tagTypeName)
+//    {
+//        if (TagType.CATEGORY_TAG_TYPE.equals(tagTypeName)) { return null; }
+//        else if (TagType.PERSON_TAG_TAG_TYPE.equals(tagTypeName)) { return getTagIds (); }
+//        else return Collections.emptyList();
+//    }
 
     @DynamoDBIgnore
     public String getDisplayColString()
@@ -191,25 +190,25 @@ public class OrgEvent extends BaseOrg implements ImageContainer
         this.eventCompleted = eventCompleted;
     }
 
-    @DynamoDBAttribute(attributeName = "TagIds")
-    public List<String> getTagIds()
-    {
-        return tagIds;
-    }
-    public void setTagIds(List<String> tagIds)
-    {
-        this.tagIds = tagIds;
-    }
+//    @DynamoDBAttribute(attributeName = "TagIds")
+//    public List<String> getTagIds()
+//    {
+//        return tagIds == null ? new ArrayList<>() : tagIds;
+//    }
+//    public void setTagIds(List<String> tagIds)
+//    {
+//        this.tagIds = tagIds;
+//    }
 
-    @DynamoDBAttribute(attributeName = "CategoryIds")
-    public List<String> getCategoryIds()
-    {
-        return categoryIds;
-    }
-    public void setCategoryIds(List<String> categoryIds)
-    {
-        this.categoryIds = categoryIds;
-    }
+//    @DynamoDBAttribute(attributeName = "CategoryIds")
+//    public List<String> getCategoryIds()
+//    {
+//        return categoryIds == null ? new ArrayList<>() : categoryIds;
+//    }
+//    public void setCategoryIds(List<String> categoryIds)
+//    {
+//        this.categoryIds = categoryIds;
+//    }
 
     @DynamoDBAttribute(attributeName = "DisplayCategories")
     public boolean getDisplayCategories()
@@ -305,8 +304,8 @@ public class OrgEvent extends BaseOrg implements ImageContainer
         if (getDisplayCol() != orgEvent.getDisplayCol()) return false;
         if (getDisplayOrder() != null ? !getDisplayOrder().equals(orgEvent.getDisplayOrder()) : orgEvent.getDisplayOrder() != null) return false;
         if (getBlurbHtml() != null ? !getBlurbHtml().equals(orgEvent.getBlurbHtml()) : orgEvent.getBlurbHtml() != null) return false;
-        if (getTagIds() != null ? !getTagIds().equals(orgEvent.getTagIds()) : orgEvent.getTagIds() != null) return false;
-        if (getCategoryIds() != null ? !getCategoryIds().equals(orgEvent.getCategoryIds()) : orgEvent.getCategoryIds() != null) return false;
+//        if (getTagIds() != null ? !getTagIds().equals(orgEvent.getTagIds()) : orgEvent.getTagIds() != null) return false;
+//        if (getCategoryIds() != null ? !getCategoryIds().equals(orgEvent.getCategoryIds()) : orgEvent.getCategoryIds() != null) return false;
         if (getIterationLabelSingular() != null ? !getIterationLabelSingular().equals(orgEvent.getIterationLabelSingular()) : orgEvent.getIterationLabelSingular() != null)
             return false;
         return getIterationLabelPlural() != null ? getIterationLabelPlural().equals(orgEvent.getIterationLabelPlural()) : orgEvent.getIterationLabelPlural() == null;
@@ -321,8 +320,8 @@ public class OrgEvent extends BaseOrg implements ImageContainer
         result = 31 * result + (getDisplayOrder() != null ? getDisplayOrder().hashCode() : 0);
         result = 31 * result + (getUseOrgBanner() ? 1 : 0);
         result = 31 * result + (getBlurbHtml() != null ? getBlurbHtml().hashCode() : 0);
-        result = 31 * result + (getTagIds() != null ? getTagIds().hashCode() : 0);
-        result = 31 * result + (getCategoryIds() != null ? getCategoryIds().hashCode() : 0);
+//        result = 31 * result + (getTagIds() != null ? getTagIds().hashCode() : 0);
+//        result = 31 * result + (getCategoryIds() != null ? getCategoryIds().hashCode() : 0);
         result = 31 * result + (getDisplayCategories() ? 1 : 0);
         result = 31 * result + (getAcceptDonations() ? 1 : 0);
         result = 31 * result + (getAcceptPledges() ? 1 : 0);

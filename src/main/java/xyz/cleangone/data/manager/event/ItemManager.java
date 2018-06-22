@@ -16,6 +16,7 @@ import xyz.cleangone.data.manager.TagManager;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 
@@ -46,10 +47,10 @@ public class ItemManager implements ImageContainerManager
         this.item = item;
     }
 
-    public CatalogItem createItem(String name, String categoryId)
+    public CatalogItem createItem(String name, String tagId)
     {
         CatalogItem item = new CatalogItem(name, org.getId(), event.getId());
-        if (categoryId != null) { item.addCategoryId(categoryId); }
+        if (tagId != null) { item.addTagId(tagId); }
 
         itemDao.save(item);
         return item;
@@ -88,10 +89,18 @@ public class ItemManager implements ImageContainerManager
             .collect(Collectors.toList());
     }
 
-    public List<CatalogItem> getItems(String categoryId)
+    public List<CatalogItem> getItemsWithCategory(String tagId)
+    {
+        return getItems(item -> item.getCategoryIds().contains(tagId));
+    }
+    public List<CatalogItem> getItemsWithTag(String tagId)
+    {
+        return getItems(item -> item.getTagIds().contains(tagId));
+    }
+    private List<CatalogItem> getItems(Predicate<? super CatalogItem> predicate)
     {
         return getItems().stream()
-            .filter(item -> item.getCategoryIds().contains(categoryId))
+            .filter(predicate)
             .collect(Collectors.toList());
     }
 
@@ -116,6 +125,24 @@ public class ItemManager implements ImageContainerManager
         for (CatalogItem item : items)
         {
             item.removeCategoryId(categoryId);
+            itemDao.save(item);
+        }
+    }
+
+    public void addTagId(String tagId, List<CatalogItem> items)
+    {
+        for (CatalogItem item : items)
+        {
+            item.addTagId(tagId);
+            itemDao.save(item);
+        }
+    }
+
+    public void removeTagId(String tagId, List<CatalogItem> items)
+    {
+        for (CatalogItem item : items)
+        {
+            item.removeTagId(tagId);
             itemDao.save(item);
         }
     }

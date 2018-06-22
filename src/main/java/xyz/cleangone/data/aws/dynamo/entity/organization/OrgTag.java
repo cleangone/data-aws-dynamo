@@ -2,7 +2,9 @@ package xyz.cleangone.data.aws.dynamo.entity.organization;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.*;
 import xyz.cleangone.data.aws.dynamo.entity.base.BaseMixinEntity;
+import xyz.cleangone.data.aws.dynamo.entity.base.BaseNamedEntity;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityField;
+import xyz.cleangone.data.aws.dynamo.entity.base.EntityType;
 import xyz.cleangone.data.aws.dynamo.entity.person.Person;
 
 import java.util.Comparator;
@@ -11,11 +13,9 @@ import java.util.Map;
 import static java.util.Objects.requireNonNull;
 
 @DynamoDBTable(tableName="OrgTag")
-public class OrgTag extends BaseMixinEntity implements Comparable<OrgTag>
+public class OrgTag extends BaseNamedEntity implements Comparable<OrgTag>
 {
     public static final EntityField EVENT_NAME_FIELD = new EntityField("tag.eventName", "Event Name");
-
-    public enum TagType { PersonTag, Category, UserRole }
 
     public static String USER = "user";
 
@@ -29,24 +29,26 @@ public class OrgTag extends BaseMixinEntity implements Comparable<OrgTag>
 
     private String orgId;
     private String eventId;
+    private String tagTypeId;
     private String displayOrder;
-    private TagType tagType;
     private boolean userVisible;
+
+    private TagType tagType; // transient
     private String eventName; // transient
 
 
     public OrgTag() { }
-
-    public OrgTag(String name, TagType tagType, String orgId)
+    public OrgTag(String name, TagType tagType)
     {
         super(requireNonNull(name));
         setTagType(requireNonNull(tagType));
-        setOrgId(requireNonNull(orgId));
+        setOrgId(tagType.getOrgId());
+        setTagTypeId(tagType.getId());
     }
 
-    public OrgTag(String name, TagType tagType, String orgId, String eventId)
+    public OrgTag(String name, TagType tagType, String eventId)
     {
-        this(name, tagType, orgId);
+        this(name, tagType);
         setEventId(requireNonNull(eventId));
     }
 
@@ -72,10 +74,16 @@ public class OrgTag extends BaseMixinEntity implements Comparable<OrgTag>
     }
     
     @DynamoDBIgnore
-    public boolean isTagType(TagType tagType)
+    public boolean isTagType(String tagTypeName)
     {
-        return this.tagType == tagType;
+        return (tagType != null && tagType.isTagType(tagTypeName)); // null-check to handle old data
     }
+
+    @DynamoDBIgnore public boolean isEntityType(EntityType entityType)
+    {
+        return (tagType != null && tagType.isEntityType(entityType));
+    }
+
 
     @DynamoDBAttribute(attributeName = "OrgId")
     public String getOrgId()
@@ -97,6 +105,16 @@ public class OrgTag extends BaseMixinEntity implements Comparable<OrgTag>
         this.eventId = eventId;
     }
 
+    @DynamoDBAttribute(attributeName = "TagTypeId")
+    public String getTagTypeId()
+    {
+        return tagTypeId;
+    }
+    public void setTagTypeId(String tagTypeId)
+    {
+        this.tagTypeId = tagTypeId;
+    }
+
     @DynamoDBAttribute(attributeName = "DisplayOrder")
     public String getDisplayOrder()
     {
@@ -107,16 +125,6 @@ public class OrgTag extends BaseMixinEntity implements Comparable<OrgTag>
         this.displayOrder = displayOrder;
     }
 
-    @DynamoDBTyped(DynamoDBMapperFieldModel.DynamoDBAttributeType.S)
-    public TagType getTagType()
-    {
-        return tagType;
-    }
-    public void setTagType(TagType tagType)
-    {
-        this.tagType = tagType;
-    }
-
     @DynamoDBAttribute(attributeName = "UserVisible")
     public boolean getUserVisible()
     {
@@ -125,6 +133,16 @@ public class OrgTag extends BaseMixinEntity implements Comparable<OrgTag>
     public void setUserVisible(boolean userVisible)
     {
         this.userVisible = userVisible;
+    }
+
+    @DynamoDBIgnore
+    public TagType getTagType()
+    {
+        return tagType;
+    }
+    public void setTagType(TagType tagType)
+    {
+        this.tagType = tagType;
     }
 
     @DynamoDBIgnore

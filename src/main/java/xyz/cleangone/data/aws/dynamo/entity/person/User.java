@@ -23,7 +23,6 @@ public class User extends BasePerson
     public static final EntityField SHOW_QUICK_BID_FIELD = new EntityField("user.showQuickBid", "Show QuickBid Button");
     public static final EntityField LAST_FIRST_FIELD = new EntityField("user.lastfirst", "Last, First");
     public static final EntityField ADMIN_FIELD = new EntityField("user.transient.admin", "Admin");
-    public static final EntityField TAGS_FIELD = new EntityField("user.tags", "Roles");
 
     private List<String> watchedItemIds;  // todo - doesn't belong in core user
     private boolean showBidConfirm;
@@ -38,9 +37,6 @@ public class User extends BasePerson
     private String phone;  // todo - multiple phones, with type and acceptTexts
     private boolean acceptTexts;
     private List<AdminPrivledge> adminPrivledges;
-
-    private List<String> tagIds; // userRoles
-    private String tagsCsv; // transient
 
     @DynamoDBIgnore
     public boolean isSuperAdmin()
@@ -292,25 +288,6 @@ public class User extends BasePerson
         adminPrivledges.remove(adminPrivledge);
     }
 
-    @DynamoDBAttribute(attributeName="TagIds")
-    public List<String> getTagIds()
-    {
-        if (tagIds == null) { tagIds = new ArrayList<>(); }
-        return tagIds;
-    }
-    public void setTagIds(List<String> tagIds)
-    {
-        this.tagIds = tagIds;
-    }
-    public void addTagId(String tagId)
-    {
-        if (!getTagIds().contains(tagId)) { tagIds.add(tagId); }
-    }
-    public void removeTagId(String tagId)
-    {
-        tagIds.remove(tagId);
-    }
-
     @DynamoDBAttribute(attributeName="WatchedItemIds")
     public List<String> getWatchedItemIds()
     {
@@ -328,29 +305,6 @@ public class User extends BasePerson
     public void removeWatchedItemId(String itemId)
     {
         watchedItemIds.remove(itemId);
-    }
-
-    @DynamoDBIgnore
-    public String getTagsCsv() { return tagsCsv; }
-    public void setTagsCsv(Map<String, OrgTag> tagsById)
-    {
-        tagsCsv = getCsv(tagsById);
-    }
-
-
-    // todo - copied from Person
-    private String getCsv(Map<String, OrgTag> tagsById)
-    {
-        if (getTagIds().isEmpty()) { return ""; }
-
-        List<String> tagNames = tagIds.stream()
-            .filter(id -> tagsById.containsKey(id)) // map may be of a subset of tags
-            .map(id -> tagsById.get(id))
-            .map(OrgTag::getName)
-            .collect(Collectors.toList());
-
-        Collections.sort(tagNames);
-        return tagNames.stream().collect(Collectors.joining(", "));
     }
 
     private String encrypt(String s)

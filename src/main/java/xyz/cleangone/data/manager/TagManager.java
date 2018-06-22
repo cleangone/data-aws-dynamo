@@ -1,11 +1,12 @@
 package xyz.cleangone.data.manager;
 
 import xyz.cleangone.data.aws.dynamo.dao.org.TagDao;
-import xyz.cleangone.data.aws.dynamo.entity.base.BaseEntity;
+import xyz.cleangone.data.aws.dynamo.dao.org.TagTypeDao;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityType;
 import xyz.cleangone.data.aws.dynamo.entity.organization.OrgEvent;
 import xyz.cleangone.data.aws.dynamo.entity.organization.Organization;
 import xyz.cleangone.data.aws.dynamo.entity.organization.OrgTag;
+import xyz.cleangone.data.aws.dynamo.entity.organization.TagType;
 import xyz.cleangone.data.cache.EntityCache;
 
 import java.util.*;
@@ -16,20 +17,18 @@ import static java.util.Objects.requireNonNull;
 
 public class TagManager
 {
+    public static final EntityCache<TagType> TAG_TYPE_CACHE = new EntityCache<>(EntityType.TagType);
     public static final EntityCache<OrgTag> TAG_CACHE = new EntityCache<>(EntityType.Tag);
-    private final TagDao tagDao;
+    private final TagDao tagDao = new TagDao();
+    private final TagTypeDao tagTypeDao = new TagTypeDao();
 
     private Organization org;
+    private TagType tagType; // for admin
 
-    public TagManager()
-    {
-        tagDao = new TagDao();
-    }
-
+    public TagManager() { }
     public TagManager(Organization org)
     {
         this.org = org;
-        tagDao = new TagDao();
     }
 
     // no external entity should want all the diff tag types mixed together
@@ -39,47 +38,65 @@ public class TagManager
         List<OrgTag> tags = TAG_CACHE.get(org);
         if (tags != null) { return tags; }
 
+        List<TagType> tagTypes = new ArrayList<>(tagTypeDao.getByOrg(org.getId()));
+        Map<String, TagType> tagTypeById = tagTypes.stream()
+            .collect(Collectors.toMap(TagType::getId, tagType -> tagType));
+
         tags = new ArrayList<>(tagDao.getByOrg(org.getId()));
+        tags.forEach(t -> t.setTagType(tagTypeById.get(t.getTagTypeId())));
         tags.sort((tag1, tag2) -> tag1.compareTo(tag2));
         TAG_CACHE.put(org, tags, start);
         return tags;
     }
 
-    public static String getSingularName(OrgTag.TagType tagType)
+    public List<TagType> getTagTypes()
     {
-        if (tagType == OrgTag.TagType.PersonTag) { return "Tag"; }
-        else if (tagType == OrgTag.TagType.Category) { return "Category"; }
-        else if (tagType == OrgTag.TagType.UserRole) { return "User Role"; }
-        else return "Unknown";
+        Date start = new Date();
+        List<TagType> tagTypes = TAG_TYPE_CACHE.get(org);
+        if (tagTypes != null) { return tagTypes; }
+
+        tagTypes = new ArrayList<>(tagTypeDao.getByOrg(org.getId()));
+        tagTypes.sort((tagType1, tagType2) -> tagType1.compareTo(tagType2));
+
+        TAG_TYPE_CACHE.put(org, tagTypes, start);
+        return tagTypes;
     }
 
-    public static String getPluralName(OrgTag.TagType tagType)
+    public TagType getTagType()
     {
-        if (tagType == OrgTag.TagType.PersonTag) { return "Tags"; }
-        else if (tagType == OrgTag.TagType.Category) { return "Categories"; }
-        else if (tagType == OrgTag.TagType.UserRole) { return "User Roles"; }
-        else return "Unknown";
+        return tagType;
+    }
+    public void setTagType(TagType tagType)
+    {
+        this.tagType = tagType;
     }
 
-    public List<OrgTag> getPersonTags()
-    {
-        return getTags(OrgTag.TagType.PersonTag);
-    }
     public List<OrgTag> getCategories()
     {
-        return getTags(OrgTag.TagType.Category);
+        return getTags(TagType.CATEGORY_TAG_TYPE);
+    }
+    public List<OrgTag> getPersonTags()
+    {
+        return getTags(TagType.PERSON_TAG_TAG_TYPE);
     }
 
-    public List<OrgTag> getTags(OrgTag.TagType tagType)
+    public List<OrgTag> getTags(String tagTypeName)
     {
         return getTags().stream()
-            .filter(t -> t.isTagType(tagType))
+            .filter(t -> t.isTagType(tagTypeName))
             .collect(Collectors.toList());
     }
 
-    public List<OrgTag> getTags(OrgTag.TagType tagType, Map<String, OrgEvent> eventsById)
+    public List<OrgTag> getTags(EntityType entityType)
     {
-        List<OrgTag>  tags = getTags(tagType);
+        return getTags().stream()
+            .filter(t -> t.isEntityType(entityType))
+            .collect(Collectors.toList());
+    }
+
+    public List<OrgTag> getTags(String tagTypeName, Map<String, OrgEvent> eventsById)
+    {
+        List<OrgTag>  tags = getTags(tagTypeName);
         tags.forEach(tag ->  {
             if (eventsById.containsKey(tag.getEventId())) { tag.setEventName(eventsById.get(tag.getEventId()).getName()); } });
 
@@ -95,35 +112,32 @@ public class TagManager
             .collect(Collectors.toList());
     }
 
-    public List<OrgTag> getOrgTags(OrgTag.TagType tagType)
+    public List<OrgTag> getOrgTags(String tagTypeName)
     {
-        return getTags(tagType).stream()
+        return getTags(tagTypeName).stream()
             .filter(t -> t.getEventId() == null)
             .collect(Collectors.toList());
     }
 
-    public List<OrgTag> getEventVisibleTags(OrgTag.TagType tagType, OrgEvent event)
+    public List<OrgTag> getEventVisibleTags(String tagTypeName, OrgEvent event)
     {
         if (event == null) { return new ArrayList<OrgTag>(); }
 
-        List<String> tagIds = event.getTagIds(tagType);
-        return getTags(tagType).stream()
-            .filter(t ->
-                event.getId().equals(t.getEventId()) ||
-                (t.getEventId() == null && tagIds != null && tagIds.contains(t.getId())))
+        return getTags(tagTypeName).stream()
+            .filter(t -> t.getEventId() == null || t.getEventId().equals(event.getId()))
             .collect(Collectors.toList());
     }
 
-    public List<OrgTag> getEventTags(OrgTag.TagType tagType, String eventId)
+    public List<OrgTag> getEventTags(String tagTypeName, String eventId)
     {
-        return getTags(tagType).stream()
+        return getTags(tagTypeName).stream()
             .filter(t -> eventId.equals(t.getEventId()))
             .collect(Collectors.toList());
     }
 
-    public List<OrgTag> getEventTags(OrgTag.TagType tagType, String eventId, List<String> tagIds)
+    public List<OrgTag> getEventTags(String tagTypeName, String eventId, List<String> tagIds)
     {
-        return getTags(tagType).stream()
+        return getTags(tagTypeName).stream()
             .filter(t -> eventId.equals(t.getEventId()) || tagIds.contains(t.getId()))
             .collect(Collectors.toList());
     }
@@ -138,15 +152,19 @@ public class TagManager
             .collect(Collectors.toMap(OrgTag::getId, Function.identity()));
     }
 
-    public void createTag(String name, OrgTag.TagType tagType)
+    public void createTag(String name, TagType tagType, OrgEvent event)
     {
-        OrgTag tag = new OrgTag(name, tagType, org.getId());
+        OrgTag tag = new OrgTag(name, tagType, event.getId());
         tagDao.save(tag);
     }
 
-    public void createTag(String name, OrgTag.TagType tagType, OrgEvent event)
+    public void createTag(String name)
     {
-        OrgTag tag = new OrgTag(name, tagType, org.getId(), event.getId());
+        createTag(name, tagType);
+    }
+    public void createTag(String name, TagType tagType)
+    {
+        OrgTag tag = new OrgTag(name, tagType);
         tagDao.save(tag);
     }
 
@@ -157,6 +175,25 @@ public class TagManager
     public void delete(OrgTag tag)
     {
         tagDao.delete(tag);
+    }
+
+    public void createTagType(String name, EntityType entityType)
+    {
+        if (!getTags(name).isEmpty()) { return; }
+
+        TagType tagType = new TagType(name, entityType, org.getId());
+        tagTypeDao.save(tagType);
+        TAG_TYPE_CACHE.clear(org);
+    }
+
+    public void save(TagType tagType)
+    {
+        tagTypeDao.save(tagType);
+    }
+    public void delete(TagType tagType)
+    {
+        tagTypeDao.delete(tagType);
+        TAG_TYPE_CACHE.clear(org);
     }
 
     public void setOrg(Organization org)
