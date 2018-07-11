@@ -1,13 +1,13 @@
 package xyz.cleangone.data.aws.dynamo.dao.event;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
-import xyz.cleangone.data.aws.dynamo.dao.DynamoBaseDao;
-import xyz.cleangone.data.aws.dynamo.entity.base.EntityType;
+import xyz.cleangone.data.aws.dynamo.dao.CachingDao;
+import xyz.cleangone.data.aws.dynamo.entity.lastTouched.EntityType;
 import xyz.cleangone.data.aws.dynamo.entity.organization.EventDate;
 
 import java.util.List;
 
-public class EventDateDao extends DynamoBaseDao<EventDate>
+public class EventDateDao extends CachingDao<EventDate>
 {
     public List<EventDate> getByOrg(String orgId)
     {

@@ -1,12 +1,12 @@
 package xyz.cleangone.data.aws.dynamo.dao.event;
 
-import xyz.cleangone.data.aws.dynamo.dao.DynamoBaseDao;
+import xyz.cleangone.data.aws.dynamo.dao.CachingDao;
 import xyz.cleangone.data.aws.dynamo.entity.organization.OrgEvent;
-import xyz.cleangone.data.aws.dynamo.entity.base.EntityType;
+import xyz.cleangone.data.aws.dynamo.entity.lastTouched.EntityType;
 
 import java.util.List;
 
-public class EventDao extends DynamoBaseDao<OrgEvent>
+public class EventDao extends CachingDao<OrgEvent>
 {
     public OrgEvent getById(String id)
     {

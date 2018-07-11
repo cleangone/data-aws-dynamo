@@ -3,11 +3,11 @@ package xyz.cleangone.data.aws.dynamo.entity.person;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBIgnore;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
-import xyz.cleangone.data.aws.dynamo.entity.base.BaseMixinEntity;
+import xyz.cleangone.data.aws.dynamo.entity.base.BaseNamedEntity;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityField;
 
 @DynamoDBTable(tableName="BasePersonDummy")
-public class BasePerson extends BaseMixinEntity
+public class BasePerson extends BaseNamedEntity
 {
     public static final EntityField FIRST_NAME_FIELD = new EntityField("Person.firstName", "First Name");
     public static final EntityField LAST_NAME_FIELD = new EntityField("Person.lastName", "Last Name");

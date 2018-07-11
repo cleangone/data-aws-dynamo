@@ -1,6 +1,6 @@
 package xyz.cleangone.data.cache;
 
-import xyz.cleangone.data.aws.dynamo.entity.base.EntityType;
+import xyz.cleangone.data.aws.dynamo.entity.lastTouched.EntityType;
 
 import java.math.BigDecimal;
 import java.util.*;

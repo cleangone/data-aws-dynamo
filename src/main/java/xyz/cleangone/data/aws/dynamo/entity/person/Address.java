@@ -2,11 +2,11 @@ package xyz.cleangone.data.aws.dynamo.entity.person;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
-import xyz.cleangone.data.aws.dynamo.entity.base.BaseMixinEntity;
+import xyz.cleangone.data.aws.dynamo.entity.base.BaseNamedEntity;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityField;
 
 @DynamoDBTable(tableName="Address")
-public class Address extends BaseMixinEntity
+public class Address extends BaseNamedEntity
 {
     public static final EntityField ADDRESS_FIELD = new EntityField("Address.streetAddress", "Address");
     public static final EntityField CITY_FIELD = new EntityField("Address.city", "City");

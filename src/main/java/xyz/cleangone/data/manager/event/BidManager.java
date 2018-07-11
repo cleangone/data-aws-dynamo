@@ -2,7 +2,7 @@ package xyz.cleangone.data.manager.event;
 
 import xyz.cleangone.data.aws.dynamo.dao.ItemBidDao;
 import xyz.cleangone.data.aws.dynamo.dao.UserBidDao;
-import xyz.cleangone.data.aws.dynamo.entity.base.EntityType;
+import xyz.cleangone.data.aws.dynamo.entity.lastTouched.EntityType;
 import xyz.cleangone.data.aws.dynamo.entity.bid.BidUtils;
 import xyz.cleangone.data.aws.dynamo.entity.bid.ItemBid;
 import xyz.cleangone.data.aws.dynamo.entity.item.CatalogItem;

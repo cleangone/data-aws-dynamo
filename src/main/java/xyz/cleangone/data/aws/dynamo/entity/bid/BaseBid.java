@@ -4,7 +4,6 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBIgnore;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import xyz.cleangone.data.aws.dynamo.entity.base.BaseEntity;
-import xyz.cleangone.data.aws.dynamo.entity.base.BaseMixinEntity;
 
 import java.math.BigDecimal;
 

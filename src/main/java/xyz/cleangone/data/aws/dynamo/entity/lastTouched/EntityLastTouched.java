@@ -1,6 +1,7 @@
-package xyz.cleangone.data.aws.dynamo.entity.base;
+package xyz.cleangone.data.aws.dynamo.entity.lastTouched;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.*;
+import xyz.cleangone.data.aws.dynamo.entity.base.BaseEntity;
 
 import java.util.Date;
 import java.util.HashMap;

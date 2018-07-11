@@ -5,7 +5,7 @@ import xyz.cleangone.data.aws.dynamo.dao.*;
 import xyz.cleangone.data.aws.dynamo.dao.event.EventDao;
 import xyz.cleangone.data.aws.dynamo.dao.event.EventDateDao;
 import xyz.cleangone.data.aws.dynamo.dao.event.EventParticipantDao;
-import xyz.cleangone.data.aws.dynamo.entity.base.EntityType;
+import xyz.cleangone.data.aws.dynamo.entity.lastTouched.EntityType;
 import xyz.cleangone.data.aws.dynamo.entity.image.ImageType;
 import xyz.cleangone.data.aws.dynamo.entity.item.CatalogItem;
 import xyz.cleangone.data.aws.dynamo.entity.organization.*;

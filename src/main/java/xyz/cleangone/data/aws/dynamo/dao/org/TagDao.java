@@ -2,14 +2,14 @@ package xyz.cleangone.data.aws.dynamo.dao.org;
 
 import static xyz.cleangone.data.aws.dynamo.entity.organization.OrgTag.*;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
-import xyz.cleangone.data.aws.dynamo.dao.DynamoBaseDao;
+import xyz.cleangone.data.aws.dynamo.dao.CachingDao;
 import xyz.cleangone.data.aws.dynamo.entity.organization.OrgTag;
-import xyz.cleangone.data.aws.dynamo.entity.base.EntityType;
+import xyz.cleangone.data.aws.dynamo.entity.lastTouched.EntityType;
 import xyz.cleangone.data.aws.dynamo.entity.organization.TagType;
 
 import java.util.List;
 
-public class TagDao extends DynamoBaseDao<OrgTag>
+public class TagDao extends CachingDao<OrgTag>
 {
     public List<OrgTag> getByOrg(String orgId)
     {

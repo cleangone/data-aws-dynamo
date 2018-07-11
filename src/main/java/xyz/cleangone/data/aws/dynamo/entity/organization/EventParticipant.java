@@ -3,7 +3,7 @@ package xyz.cleangone.data.aws.dynamo.entity.organization;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBIgnore;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
-import xyz.cleangone.data.aws.dynamo.entity.base.BaseMixinEntity;
+import xyz.cleangone.data.aws.dynamo.entity.base.BaseNamedEntity;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityField;
 import xyz.cleangone.data.aws.dynamo.entity.person.Person;
 
@@ -12,7 +12,7 @@ import java.util.Map;
 import static java.util.Objects.requireNonNull;
 
 @DynamoDBTable(tableName="EventParticipant")
-public class EventParticipant extends BaseMixinEntity
+public class EventParticipant extends BaseNamedEntity
 {
     public static final EntityField LAST_COMMA_FIRST_FIELD = new EntityField("eventParticipant.lastCommaFirst", "Person");
     public static final EntityField SELF_REGISTERED_FIELD = new EntityField("eventParticipant.selfRegistered", "Self Registered");

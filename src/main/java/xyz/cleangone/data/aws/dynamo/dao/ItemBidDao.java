@@ -1,12 +1,12 @@
 package xyz.cleangone.data.aws.dynamo.dao;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
-import xyz.cleangone.data.aws.dynamo.entity.base.EntityType;
+import xyz.cleangone.data.aws.dynamo.entity.lastTouched.EntityType;
 import xyz.cleangone.data.aws.dynamo.entity.bid.ItemBid;
 
 import java.util.List;
 
-public class ItemBidDao extends DynamoBaseDao<ItemBid>
+public class ItemBidDao extends CachingDao<ItemBid>
 {
     public ItemBid getById(String id)
     {

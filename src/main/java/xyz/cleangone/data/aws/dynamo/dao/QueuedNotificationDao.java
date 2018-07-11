@@ -4,7 +4,7 @@ import xyz.cleangone.data.aws.dynamo.entity.notification.QueuedNotification;
 
 import java.util.List;
 
-public class QueuedNotificationDao extends DynamoBaseDao<QueuedNotification>
+public class QueuedNotificationDao extends CachingDao<QueuedNotification>
 {
     public QueuedNotification getById(String id)
     {

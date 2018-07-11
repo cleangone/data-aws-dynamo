@@ -20,14 +20,14 @@ import static java.util.Objects.requireNonNull;
 public class Action extends BaseEntity
 {
     public static final EntityField AMOUNT_FIELD = new EntityField("action.amount", "Amount");
-    public static final EntityField ESTIMATED_AMOUNT_FIELD = new EntityField("action.estomatedAmount", "Amount (Est)");
+    public static final EntityField ESTIMATED_AMOUNT_FIELD = new EntityField("action.estimatedAmount", "Amount (Est)");
 
     private String orgId;
     private ActionType actionType;
     private BigDecimal amount;
     private BigDecimal iterationAmount;
     private String description;
-    private String sourcePersonId;
+    private String sourcePersonId;  // todo - interesting that this is not a userId
     private String targetEventId;
     private String targetPersonId;
     private String referenceActionId;

@@ -1,11 +1,11 @@
 package xyz.cleangone.data.aws.dynamo.dao;
 
 import xyz.cleangone.data.aws.dynamo.entity.action.Action;
-import xyz.cleangone.data.aws.dynamo.entity.base.EntityType;
+import xyz.cleangone.data.aws.dynamo.entity.lastTouched.EntityType;
 
 import java.util.List;
 
-public class ActionDao extends DynamoBaseDao<Action>
+public class ActionDao extends CachingDao<Action>
 {
     public List<Action> getBySourcePersonId(String id)
     {

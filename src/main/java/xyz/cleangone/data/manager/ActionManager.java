@@ -3,7 +3,7 @@ package xyz.cleangone.data.manager;
 import xyz.cleangone.data.aws.dynamo.dao.ActionDao;
 import xyz.cleangone.data.aws.dynamo.dao.event.EventDao;
 import xyz.cleangone.data.aws.dynamo.entity.action.Action;
-import xyz.cleangone.data.aws.dynamo.entity.base.EntityType;
+import xyz.cleangone.data.aws.dynamo.entity.lastTouched.EntityType;
 import xyz.cleangone.data.aws.dynamo.entity.bid.UserBid;
 import xyz.cleangone.data.aws.dynamo.entity.item.CartItem;
 import xyz.cleangone.data.aws.dynamo.entity.item.PurchaseItem;

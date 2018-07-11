@@ -1,4 +1,4 @@
-package xyz.cleangone.data.aws.dynamo.entity.base;
+package xyz.cleangone.data.aws.dynamo.entity.lastTouched;
 
 public enum EntityType
 {

@@ -1,9 +1,9 @@
 package xyz.cleangone.data.cache;
 
 import xyz.cleangone.data.aws.dynamo.entity.base.BaseEntity;
-import xyz.cleangone.data.aws.dynamo.entity.base.BaseMixinEntity;
-import xyz.cleangone.data.aws.dynamo.entity.base.EntityLastTouched;
-import xyz.cleangone.data.aws.dynamo.entity.base.EntityType;
+import xyz.cleangone.data.aws.dynamo.entity.base.BaseNamedEntity;
+import xyz.cleangone.data.aws.dynamo.entity.lastTouched.EntityLastTouched;
+import xyz.cleangone.data.aws.dynamo.entity.lastTouched.EntityType;
 import xyz.cleangone.data.aws.dynamo.dao.org.OrgDao;
 import xyz.cleangone.data.aws.dynamo.entity.organization.Organization;
 
@@ -33,45 +33,45 @@ public class EntityCache <T extends BaseEntity>
         this.maxEntities = maxEntities;
     }
 
-    public void clear(BaseMixinEntity entity) { clear(entity.getId()); }
-    public void clear(String entityId)
+    public void clear(BaseNamedEntity keyEntity) { clear(keyEntity.getId()); }
+    public void clear(String keyEntityId)
     {
-        entityIdToEntityCacheItems.put(entityId, null);
-        entityIdLastChecked.put(entityId, null);
-        entityIds.remove(entityId);
+        entityIdToEntityCacheItems.put(keyEntityId, null);
+        entityIdLastChecked.put(keyEntityId, null);
+        entityIds.remove(keyEntityId);
     }
 
     public List<T> get(Organization org)
     {
         return get(org, org.getId());
     }
-    public List<T> get(BaseMixinEntity entity, String orgId)
+    public List<T> get(BaseNamedEntity keyEntity, String orgId)
     {
         Date start = new Date();
-        EntityCacheItem <T> entityCacheItem = entityIdToEntityCacheItems.get(entity.getId());
+        EntityCacheItem <T> entityCacheItem = entityIdToEntityCacheItems.get(keyEntity.getId());
         if (entityCacheItem == null)
         {
             return null;
         }
 
-        Date lastChecked = entityIdLastChecked.get(entity.getId());
+        Date lastChecked = entityIdLastChecked.get(keyEntity.getId());
         if (lastChecked != null && lastChecked.getTime() + 5000 > start.getTime())
         {
             // checked lastTouch within last 5 secs
-            hit(entity, orgId, start);
+            hit(keyEntity, orgId, start);
             return entityCacheItem.getEntities();
         }
 
-        EntityLastTouched lastTouch = DAO.getEntityLastTouched(entity.getId());
-        entityIdLastChecked.put(entity.getId(), start);
+        EntityLastTouched lastTouch = DAO.getEntityLastTouched(keyEntity.getId());
+        entityIdLastChecked.put(keyEntity.getId(), start);
         if (lastTouch != null &&
             lastTouch.touchedBefore(entityType, entityCacheItem.getCacheDate()))
         {
-            hit(entity, orgId, start);
+            hit(keyEntity, orgId, start);
             return entityCacheItem.getEntities();
         }
 
-        entityIdToEntityCacheItems.remove(entity.getId());
+        entityIdToEntityCacheItems.remove(keyEntity.getId());
         return null;
     }
 
@@ -79,17 +79,17 @@ public class EntityCache <T extends BaseEntity>
     {
         put(org, entities, org.getId(), start);
     }
-    public void put(BaseMixinEntity entity, List<T> entities, String orgId, Date start)
+    public void put(BaseNamedEntity keyEntity, List<T> entities, String orgId, Date start)
     {
-        entityIdToEntityCacheItems.put(entity.getId(), new EntityCacheItem<>(entities));
-        miss(entity, orgId, start);
+        entityIdToEntityCacheItems.put(keyEntity.getId(), new EntityCacheItem<>(entities));
+        miss(keyEntity, orgId, start);
 
         if (maxEntities != null)
         {
             // todo - make this a more applicable collection, like a stack
             // beginning of list is most recent
-            entityIds.remove(entity.getId());
-            entityIds.add(0, entity.getId());
+            entityIds.remove(keyEntity.getId());
+            entityIds.add(0, keyEntity.getId());
 
             if (entityIds.size() > maxEntities)
             {
@@ -106,22 +106,22 @@ public class EntityCache <T extends BaseEntity>
             .collect(Collectors.toList());
     }
 
-    private void hit(BaseMixinEntity entity, String orgId, Date start)
+    private void hit(BaseNamedEntity keyEntity, String orgId, Date start)
     {
-        getStat(entity, orgId).hit(start);
+        getStat(keyEntity, orgId).hit(start);
     }
-    private void miss(BaseMixinEntity entity, String orgId, Date start)
+    private void miss(BaseNamedEntity keyEntity, String orgId, Date start)
     {
-        getStat(entity, orgId).miss(start);
+        getStat(keyEntity, orgId).miss(start);
     }
 
-    private EntityCacheStat getStat(BaseMixinEntity entity, String orgId)
+    private EntityCacheStat getStat(BaseNamedEntity keyEntity, String orgId)
     {
-        EntityCacheStat stat = entityIdToStat.get(entity.getId());
+        EntityCacheStat stat = entityIdToStat.get(keyEntity.getId());
         if (stat == null)
         {
-            stat = new EntityCacheStat(entity.getName(), entityType, orgId);
-            entityIdToStat.put(entity.getId(), stat);
+            stat = new EntityCacheStat(keyEntity.getName(), entityType, orgId);
+            entityIdToStat.put(keyEntity.getId(), stat);
         }
 
         return stat;

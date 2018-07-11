@@ -2,11 +2,11 @@ package xyz.cleangone.data.aws.dynamo.dao;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import xyz.cleangone.data.aws.dynamo.entity.person.Person;
-import xyz.cleangone.data.aws.dynamo.entity.base.EntityType;
+import xyz.cleangone.data.aws.dynamo.entity.lastTouched.EntityType;
 
 import java.util.List;
 
-public class PersonDao extends DynamoBaseDao<Person>
+public class PersonDao extends CachingDao<Person>
 {
     public Person getById(String id)
     {

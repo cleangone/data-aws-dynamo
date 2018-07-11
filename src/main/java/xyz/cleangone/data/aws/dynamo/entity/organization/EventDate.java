@@ -3,7 +3,7 @@ package xyz.cleangone.data.aws.dynamo.entity.organization;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBIgnore;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
-import xyz.cleangone.data.aws.dynamo.entity.base.BaseMixinEntity;
+import xyz.cleangone.data.aws.dynamo.entity.base.BaseNamedEntity;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityField;
 
 import java.time.*;
@@ -12,7 +12,7 @@ import java.util.Date;
 import static java.util.Objects.requireNonNull;
 
 @DynamoDBTable(tableName="EventDate")
-public class EventDate extends BaseMixinEntity
+public class EventDate extends BaseNamedEntity
 {
     public static final EntityField DATE_NAME_FIELD = new EntityField(NAME_FIELD, "Date Name");
 

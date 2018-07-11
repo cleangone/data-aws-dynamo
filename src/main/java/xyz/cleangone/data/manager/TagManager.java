@@ -2,7 +2,7 @@ package xyz.cleangone.data.manager;
 
 import xyz.cleangone.data.aws.dynamo.dao.org.TagDao;
 import xyz.cleangone.data.aws.dynamo.dao.org.TagTypeDao;
-import xyz.cleangone.data.aws.dynamo.entity.base.EntityType;
+import xyz.cleangone.data.aws.dynamo.entity.lastTouched.EntityType;
 import xyz.cleangone.data.aws.dynamo.entity.organization.OrgEvent;
 import xyz.cleangone.data.aws.dynamo.entity.organization.Organization;
 import xyz.cleangone.data.aws.dynamo.entity.organization.OrgTag;

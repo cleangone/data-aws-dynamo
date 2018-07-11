@@ -4,7 +4,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBIgnore;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import com.amazonaws.services.dynamodbv2.datamodeling.S3Link;
-import xyz.cleangone.data.aws.dynamo.entity.base.BaseMixinEntity;
+import xyz.cleangone.data.aws.dynamo.entity.base.BaseNamedEntity;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityField;
 import xyz.cleangone.data.aws.dynamo.entity.image.ImageContainer;
 
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @DynamoDBTable(tableName="BaseOrgDummy")
-public class BaseOrg extends BaseMixinEntity implements ImageContainer
+public class BaseOrg extends BaseNamedEntity implements ImageContainer
 {
     public static final EntityField TAG_FIELD = new EntityField("baseOrg.tag", "Tag Name");
     public static final EntityField BANNER_URL_FIELD = new EntityField("baseOrg.bannerUrl", "Banner URL");

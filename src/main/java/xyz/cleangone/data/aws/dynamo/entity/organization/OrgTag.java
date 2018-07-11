@@ -1,14 +1,9 @@
 package xyz.cleangone.data.aws.dynamo.entity.organization;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.*;
-import xyz.cleangone.data.aws.dynamo.entity.base.BaseMixinEntity;
 import xyz.cleangone.data.aws.dynamo.entity.base.BaseNamedEntity;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityField;
-import xyz.cleangone.data.aws.dynamo.entity.base.EntityType;
-import xyz.cleangone.data.aws.dynamo.entity.person.Person;
-
-import java.util.Comparator;
-import java.util.Map;
+import xyz.cleangone.data.aws.dynamo.entity.lastTouched.EntityType;
 
 import static java.util.Objects.requireNonNull;
 
@@ -83,7 +78,10 @@ public class OrgTag extends BaseNamedEntity implements Comparable<OrgTag>
     {
         return (tagType != null && tagType.isEntityType(entityType));
     }
-
+    @DynamoDBIgnore public String getTagTypeName()
+    {
+        return tagType == null ? "" : tagType.getName();
+    }
 
     @DynamoDBAttribute(attributeName = "OrgId")
     public String getOrgId()

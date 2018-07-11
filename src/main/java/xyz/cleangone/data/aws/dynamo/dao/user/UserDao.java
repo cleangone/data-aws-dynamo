@@ -1,13 +1,13 @@
 package xyz.cleangone.data.aws.dynamo.dao.user;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
-import xyz.cleangone.data.aws.dynamo.dao.DynamoBaseDao;
+import xyz.cleangone.data.aws.dynamo.dao.CachingDao;
 import xyz.cleangone.data.aws.dynamo.entity.person.User;
-import xyz.cleangone.data.aws.dynamo.entity.base.EntityType;
+import xyz.cleangone.data.aws.dynamo.entity.lastTouched.EntityType;
 
 import java.util.List;
 
-public class UserDao extends DynamoBaseDao<User>
+public class UserDao extends CachingDao<User>
 {
     public User getById(String id)
     {

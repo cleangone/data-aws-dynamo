@@ -1,8 +1,8 @@
 package xyz.cleangone.data.cache;
 
 import xyz.cleangone.data.aws.dynamo.entity.base.BaseEntity;
-import xyz.cleangone.data.aws.dynamo.entity.base.EntityLastTouched;
-import xyz.cleangone.data.aws.dynamo.entity.base.EntityType;
+import xyz.cleangone.data.aws.dynamo.entity.lastTouched.EntityLastTouched;
+import xyz.cleangone.data.aws.dynamo.entity.lastTouched.EntityType;
 
 import java.util.Date;
 import java.util.HashMap;

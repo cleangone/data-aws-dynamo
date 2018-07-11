@@ -3,13 +3,13 @@ package xyz.cleangone.data.aws.dynamo.entity.item;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBIgnore;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
-import xyz.cleangone.data.aws.dynamo.entity.base.BaseMixinEntity;
+import xyz.cleangone.data.aws.dynamo.entity.base.BaseNamedEntity;
 import xyz.cleangone.data.aws.dynamo.entity.base.EntityField;
 
 import java.math.BigDecimal;
 
 @DynamoDBTable(tableName = "ItemDummy")
-public class BaseItem extends BaseMixinEntity
+public class BaseItem extends BaseNamedEntity
 {
     public static final EntityField PRICE_FIELD = new EntityField("item.price", "Price");
 
