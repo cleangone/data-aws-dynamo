@@ -7,7 +7,7 @@ import xyz.cleangone.data.aws.dynamo.entity.organization.OrgEvent;
 import xyz.cleangone.data.aws.dynamo.entity.organization.Organization;
 import xyz.cleangone.data.aws.dynamo.entity.organization.OrgTag;
 import xyz.cleangone.data.aws.dynamo.entity.organization.TagType;
-import xyz.cleangone.data.cache.EntityCache;
+import xyz.cleangone.data.cache.OrgEntityCache;
 
 import java.util.*;
 import java.util.function.Function;
@@ -17,8 +17,8 @@ import static java.util.Objects.requireNonNull;
 
 public class TagManager
 {
-    public static final EntityCache<TagType> TAG_TYPE_CACHE = new EntityCache<>(EntityType.TagType);
-    public static final EntityCache<OrgTag> TAG_CACHE = new EntityCache<>(EntityType.Tag);
+    public static final OrgEntityCache<TagType> TAG_TYPE_CACHE = new OrgEntityCache<>(EntityType.TAGTYPE);
+    public static final OrgEntityCache<OrgTag> TAG_CACHE = new OrgEntityCache<>(EntityType.TAG);
     private final TagDao tagDao = new TagDao();
     private final TagTypeDao tagTypeDao = new TagTypeDao();
 

@@ -6,7 +6,7 @@ import xyz.cleangone.data.aws.dynamo.entity.lastTouched.EntityType;
 
 import java.util.List;
 
-public class PersonDao extends CachingDao<Person>
+public class PersonDao extends BaseOrgDao<Person>
 {
     public Person getById(String id)
     {
@@ -28,8 +28,8 @@ public class PersonDao extends CachingDao<Person>
     public void save(Person person)
     {
         super.save(person);
-        entityLastTouchedCache.touch(person.getId(), EntityType.Entity);
-        entityLastTouchedCache.touch(person.getOrgId(), EntityType.Person);
-        setEntityLastTouched(person.getOrgId(), EntityType.Person);
+        entityLastTouchedCache.touch(person.getId(), EntityType.ENTITY);
+        entityLastTouchedCache.touch(person.getOrgId(), EntityType.PERSON);
+        setEntityLastTouched(person.getOrgId(), EntityType.PERSON);
     }
 }

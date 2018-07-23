@@ -25,8 +25,8 @@ import static java.util.Objects.requireNonNull;
 
 public class ActionManager
 {
-    public static final EntityCache<Action> ACTION_CACHE_BY_EVENT = new EntityCache<>(EntityType.Action);
-    public static final EntityCache<Action> ACTION_CACHE_BY_PERSON = new EntityCache<>(EntityType.Action, 50);
+    public static final EntityCache<Action> ACTION_CACHE_BY_EVENT = new EntityCache<>(EntityType.ACTION);
+    public static final EntityCache<Action> ACTION_CACHE_BY_PERSON = new EntityCache<>(EntityType.ACTION, 50);
 
     private final ActionDao actionDao = new ActionDao();
     private final EventDao eventDao = new EventDao();

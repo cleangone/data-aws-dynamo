@@ -14,7 +14,7 @@ import xyz.cleangone.data.aws.dynamo.entity.organization.Organization;
 import xyz.cleangone.data.aws.dynamo.entity.organization.PaymentProcessor;
 import xyz.cleangone.data.aws.dynamo.entity.person.Person;
 import xyz.cleangone.data.aws.dynamo.entity.person.User;
-import xyz.cleangone.data.cache.EntityCache;
+import xyz.cleangone.data.cache.OrgEntityCache;
 import xyz.cleangone.data.manager.event.BidManager;
 import xyz.cleangone.data.manager.event.ItemManager;
 
@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 
 public class OrgManager implements ImageContainerManager
 {
-    public static final EntityCache<Person> PERSON_CACHE = new EntityCache<>(EntityType.Person);
+    public static final OrgEntityCache<Person> PERSON_CACHE = new OrgEntityCache<>(EntityType.PERSON);
 
     private OrgDao orgDao;
     private PersonDao personDao;

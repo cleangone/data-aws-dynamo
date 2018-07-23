@@ -6,24 +6,10 @@ import xyz.cleangone.data.aws.dynamo.entity.lastTouched.EntityLastTouched;
 import xyz.cleangone.data.aws.dynamo.entity.lastTouched.EntityType;
 import xyz.cleangone.data.cache.EntityLastTouchedCache;
 
-public class CachingDao<T extends BaseEntity> extends DynamoBaseDao<T>
+public class BaseOrgDao<T extends BaseEntity> extends CachingDao<T>
 {
+    // todo - is this still used?  why?
     protected EntityLastTouchedCache entityLastTouchedCache = EntityLastTouchedCache.getEntityLastTouchedCache();
-
-    public EntityLastTouched getEntityLastTouched(String entityId)
-    {
-        // look up the lastTouch by the primary id, which is the entityId
-        return mapper.load(EntityLastTouched.class, entityId);
-    }
-
-    public void setEntityLastTouched(String entityId, EntityType entityType)
-    {
-        EntityLastTouched lastTouched = getEntityLastTouched(entityId);
-        if (lastTouched == null) { lastTouched = new EntityLastTouched(entityId); }
-
-        lastTouched.setTouchDate(entityType);
-        mapper.save(lastTouched);
-    }
 
     protected DynamoDBScanExpression byOrgId(String id)
     {

@@ -1,13 +1,13 @@
 package xyz.cleangone.data.aws.dynamo.dao.user;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
-import xyz.cleangone.data.aws.dynamo.dao.CachingDao;
+import xyz.cleangone.data.aws.dynamo.dao.BaseOrgDao;
 import xyz.cleangone.data.aws.dynamo.entity.person.User;
 import xyz.cleangone.data.aws.dynamo.entity.lastTouched.EntityType;
 
 import java.util.List;
 
-public class UserDao extends CachingDao<User>
+public class UserDao extends BaseOrgDao<User>
 {
     public User getById(String id)
     {
@@ -34,7 +34,7 @@ public class UserDao extends CachingDao<User>
     public void save(User user)
     {
         super.save(user);
-        entityLastTouchedCache.touch(user.getId(), EntityType.Entity);
+        entityLastTouchedCache.touch(user.getId(), EntityType.ENTITY);
 //        entityLastTouchedCache.touch(user.getOrgId(), EntityType.User);
 //        setEntityLastTouched(user.getOrgId(), EntityType.User);
     }

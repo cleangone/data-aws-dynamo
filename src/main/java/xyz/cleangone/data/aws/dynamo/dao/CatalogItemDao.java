@@ -6,7 +6,7 @@ import xyz.cleangone.data.aws.dynamo.entity.item.CatalogItem;
 
 import java.util.List;
 
-public class CatalogItemDao extends CachingDao<CatalogItem>
+public class CatalogItemDao extends BaseOrgDao<CatalogItem>
 {
     public CatalogItem getById(String id)
     {
@@ -22,13 +22,13 @@ public class CatalogItemDao extends CachingDao<CatalogItem>
     public void save(CatalogItem item)
     {
         super.save(item);
-        setEntityLastTouched(item.getOrgId(), EntityType.Item);
-        setEntityLastTouched(item.getId(), EntityType.Bid);
+        setEntityLastTouched(item.getOrgId(), EntityType.ITEM);
+        setEntityLastTouched(item.getId(), EntityType.BID);
     }
 
     public void delete(CatalogItem item)
     {
-        setEntityLastTouched(item.getOrgId(), EntityType.Item);
+        setEntityLastTouched(item.getOrgId(), EntityType.ITEM);
         mapper.delete(item);
     }
 }

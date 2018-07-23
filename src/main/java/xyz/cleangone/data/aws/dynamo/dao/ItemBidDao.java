@@ -6,7 +6,7 @@ import xyz.cleangone.data.aws.dynamo.entity.bid.ItemBid;
 
 import java.util.List;
 
-public class ItemBidDao extends CachingDao<ItemBid>
+public class ItemBidDao extends BaseOrgDao<ItemBid>
 {
     public ItemBid getById(String id)
     {
@@ -22,8 +22,8 @@ public class ItemBidDao extends CachingDao<ItemBid>
     public void save(ItemBid itemBid)
     {
         super.save(itemBid);
-        entityLastTouchedCache.touch(itemBid.getItemId(), EntityType.Bid);
-        setEntityLastTouched(itemBid.getItemId(), EntityType.Bid);
+        entityLastTouchedCache.touch(itemBid.getItemId(), EntityType.BID);
+        setEntityLastTouched(itemBid.getItemId(), EntityType.BID);
     }
 }
 

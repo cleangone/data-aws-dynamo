@@ -1,13 +1,13 @@
 package xyz.cleangone.data.aws.dynamo.dao.org;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
-import xyz.cleangone.data.aws.dynamo.dao.CachingDao;
+import xyz.cleangone.data.aws.dynamo.dao.BaseOrgDao;
 import xyz.cleangone.data.aws.dynamo.entity.organization.Organization;
 import xyz.cleangone.data.aws.dynamo.entity.lastTouched.EntityType;
 
 import java.util.List;
 
-public class OrgDao extends CachingDao<Organization>
+public class OrgDao extends BaseOrgDao<Organization>
 {
     public Organization getById(String id)
     {
@@ -42,7 +42,7 @@ public class OrgDao extends CachingDao<Organization>
     public void save(Organization org)
     {
         super.save(org);
-        entityLastTouchedCache.touch(org.getId(), EntityType.Entity);
-        setEntityLastTouched(org.getId(), EntityType.Entity);
+        entityLastTouchedCache.touch(org.getId(), EntityType.ENTITY);
+        setEntityLastTouched(org.getId(), EntityType.ENTITY);
     }
 }

@@ -21,7 +21,7 @@ import static java.util.Objects.requireNonNull;
 public class BidManager
 {
     // bids cached by item
-    public static final EntityCache<ItemBid> ITEM_BID_CACHE = new EntityCache<>(EntityType.Bid);
+    public static final EntityCache<ItemBid> ITEM_BID_CACHE = new EntityCache<>(EntityType.BID);
 
     private final Organization org;
 

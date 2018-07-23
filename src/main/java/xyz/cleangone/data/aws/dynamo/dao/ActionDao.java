@@ -5,7 +5,7 @@ import xyz.cleangone.data.aws.dynamo.entity.lastTouched.EntityType;
 
 import java.util.List;
 
-public class ActionDao extends CachingDao<Action>
+public class ActionDao extends BaseOrgDao<Action>
 {
     public List<Action> getBySourcePersonId(String id)
     {
@@ -23,14 +23,14 @@ public class ActionDao extends CachingDao<Action>
 
         if (action.getSourcePersonId() != null)
         {
-            entityLastTouchedCache.touch(action.getSourcePersonId(), EntityType.Action);
-            setEntityLastTouched(action.getSourcePersonId(), EntityType.Action);
+            entityLastTouchedCache.touch(action.getSourcePersonId(), EntityType.ACTION);
+            setEntityLastTouched(action.getSourcePersonId(), EntityType.ACTION);
         }
 
         if (action.getTargetEventId() != null)
         {
-            entityLastTouchedCache.touch(action.getTargetEventId(), EntityType.Action);
-            setEntityLastTouched(action.getTargetEventId(), EntityType.Action);
+            entityLastTouchedCache.touch(action.getTargetEventId(), EntityType.ACTION);
+            setEntityLastTouched(action.getTargetEventId(), EntityType.ACTION);
         }
     }
 

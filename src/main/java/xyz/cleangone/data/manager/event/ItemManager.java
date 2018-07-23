@@ -8,7 +8,7 @@ import xyz.cleangone.data.aws.dynamo.entity.item.CatalogItem;
 import xyz.cleangone.data.aws.dynamo.entity.notification.NotificationType;
 import xyz.cleangone.data.aws.dynamo.entity.notification.QueuedNotification;
 import xyz.cleangone.data.aws.dynamo.entity.organization.*;
-import xyz.cleangone.data.cache.EntityCache;
+import xyz.cleangone.data.cache.OrgEntityCache;
 import xyz.cleangone.data.manager.ImageContainerManager;
 import xyz.cleangone.data.manager.ImageManager;
 import xyz.cleangone.data.manager.TagManager;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 public class ItemManager implements ImageContainerManager
 {
-    private static final EntityCache<CatalogItem> ITEM_CACHE = new EntityCache<>(EntityType.Item);
+    private static final OrgEntityCache<CatalogItem> ITEM_CACHE = new OrgEntityCache<>(EntityType.ITEM);
 
     private final CatalogItemDao itemDao = new CatalogItemDao();
     private final QueuedNotificationDao notificationDao = new QueuedNotificationDao();

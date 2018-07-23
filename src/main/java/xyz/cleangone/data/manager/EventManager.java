@@ -12,6 +12,7 @@ import xyz.cleangone.data.aws.dynamo.entity.organization.*;
 import xyz.cleangone.data.aws.dynamo.entity.person.Person;
 import xyz.cleangone.data.aws.dynamo.entity.person.User;
 import xyz.cleangone.data.cache.EntityCache;
+import xyz.cleangone.data.cache.OrgEntityCache;
 import xyz.cleangone.data.manager.event.ItemManager;
 
 import java.util.*;
@@ -21,9 +22,9 @@ import static java.util.Objects.requireNonNull;
 
 public class EventManager implements ImageContainerManager
 {
-    public static final EntityCache<OrgEvent> EVENT_CACHE = new EntityCache<>(EntityType.Event);
-    public static final EntityCache<EventDate> EVENT_DATE_CACHE = new EntityCache<>(EntityType.EventDate);
-    public static final EntityCache<EventParticipant> PARTICIPANT_CACHE = new EntityCache<>(EntityType.Participant);
+    public static final OrgEntityCache<OrgEvent> EVENT_CACHE = new OrgEntityCache<>(EntityType.EVENT);
+    public static final OrgEntityCache<EventDate> EVENT_DATE_CACHE = new OrgEntityCache<>(EntityType.EVENTDATE);
+    public static final EntityCache<EventParticipant> PARTICIPANT_CACHE = new EntityCache<>(EntityType.PARTICIPANT);
 
     private final EventDao eventDao;
     private final EventDateDao eventDateDao;
